@@ -1,0 +1,155 @@
+/* 
+ * Bakala Express Admin Toast Notifications
+ * Modern toast notification styling
+ */
+
+/* Toast Container */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 350px;
+}
+
+/* Base Toast Styles */
+.toast {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 14px;
+  color: #fff;
+  opacity: 0;
+  transform: translateX(30px);
+  animation: slideIn 0.3s forwards, fadeOut 0.5s forwards 5s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Toast Types */
+.toast.success {
+  background-color: #1cc88a;
+  border-left: 4px solid #169b6b;
+}
+
+.toast.error {
+  background-color: #e74a3b;
+  border-left: 4px solid #d33f2f;
+}
+
+.toast.warning {
+  background-color: #f6c23e;
+  border-left: 4px solid #dda20a;
+  color: #333;
+}
+
+.toast.info {
+  background-color: #36b9cc;
+  border-left: 4px solid #2a96ac;
+}
+
+/* Toast Content */
+.toast-icon {
+  margin-right: 12px;
+  font-size: 18px;
+}
+
+.toast-content {
+  flex: 1;
+  margin-right: 8px;
+}
+
+.toast-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.toast-message {
+  opacity: 0.9;
+}
+
+/* Close Button */
+.toast-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font-size: 18px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  padding: 0;
+  margin-left: 8px;
+}
+
+.toast-close:hover {
+  opacity: 1;
+}
+
+/* Progress Bar */
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.7);
+  animation: progress 5s linear forwards;
+}
+
+.toast.warning .toast-progress {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+  .toast-container {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    max-width: calc(100% - 20px);
+  }
+  
+  .toast {
+    width: 100%;
+  }
+} 

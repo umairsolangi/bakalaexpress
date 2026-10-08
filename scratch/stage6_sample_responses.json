@@ -1,0 +1,487 @@
+{
+    "get_seller_dashboard": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": {
+                "store": {
+                    "id": 46,
+                    "name": "Al-Madina Mart Sample",
+                    "email": "sample_seller_6abf95a7e6089@example.com",
+                    "city": "Karachi",
+                    "area": "Gulshan-e-Iqbal",
+                    "sector": "Block 5",
+                    "full_address": "Shop 12, Commercial Area, Block 5, Gulshan, Karachi",
+                    "profile_image": null,
+                    "is_open": true,
+                    "opens_at": "08:00",
+                    "closes_at": "23:00",
+                    "is_currently_open": true
+                },
+                "order_badges": {
+                    "pending": 1,
+                    "confirmed": 0,
+                    "preparing": 0,
+                    "ready": 0,
+                    "active_total": 1,
+                    "delivered": 1,
+                    "completed": 1,
+                    "cancelled": 0,
+                    "rejected": 0
+                },
+                "today": {
+                    "sales": "1680.00",
+                    "orders_count": 3
+                }
+            },
+            "message": "Seller dashboard retrieved successfully.",
+            "meta": {}
+        }
+    },
+    "get_seller_orders_all": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": [
+                {
+                    "id": 19,
+                    "status": "pending",
+                    "status_label": "Pending",
+                    "status_step": 1,
+                    "customer_name": "Zainab Sample",
+                    "customer_first_name": "Zainab",
+                    "customer_phone": "03001234567",
+                    "item_count": 1,
+                    "total_amount": "560.00",
+                    "created_at": "2026-10-02T11:29:44+00:00",
+                    "updated_at": "2026-10-02T11:29:44+00:00"
+                },
+                {
+                    "id": 20,
+                    "status": "completed",
+                    "status_label": "Completed",
+                    "status_step": 6,
+                    "customer_name": "Zainab Sample",
+                    "customer_first_name": "Zainab",
+                    "customer_phone": "03001234567",
+                    "item_count": 0,
+                    "total_amount": "1120.00",
+                    "created_at": "2026-10-02T11:29:44+00:00",
+                    "updated_at": "2026-10-02T11:29:44+00:00"
+                },
+                {
+                    "id": 21,
+                    "status": "delivered",
+                    "status_label": "Delivered",
+                    "status_step": 6,
+                    "customer_name": "Zainab Sample",
+                    "customer_first_name": "Zainab",
+                    "customer_phone": "03001234567",
+                    "item_count": 0,
+                    "total_amount": "560.00",
+                    "created_at": "2026-10-02T11:29:44+00:00",
+                    "updated_at": "2026-10-02T11:29:44+00:00"
+                }
+            ],
+            "message": "Orders retrieved successfully.",
+            "meta": {
+                "current_page": 1,
+                "last_page": 1,
+                "per_page": 15,
+                "total": 3,
+                "pending_count": 1
+            }
+        }
+    },
+    "get_seller_orders_pending": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": [
+                {
+                    "id": 19,
+                    "status": "pending",
+                    "status_label": "Pending",
+                    "status_step": 1,
+                    "customer_name": "Zainab Sample",
+                    "customer_first_name": "Zainab",
+                    "customer_phone": "03001234567",
+                    "item_count": 1,
+                    "total_amount": "560.00",
+                    "created_at": "2026-10-02T11:29:44+00:00",
+                    "updated_at": "2026-10-02T11:29:44+00:00"
+                }
+            ],
+            "message": "Orders retrieved successfully.",
+            "meta": {
+                "current_page": 1,
+                "last_page": 1,
+                "per_page": 15,
+                "total": 1,
+                "pending_count": 1
+            }
+        }
+    },
+    "get_seller_order_detail": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": {
+                "id": 19,
+                "status": "pending",
+                "status_label": "Pending",
+                "status_step": 1,
+                "allowed_actions": [
+                    "confirm",
+                    "reject"
+                ],
+                "customer": {
+                    "name": "Zainab Sample",
+                    "phone": "03001234567",
+                    "address": "Apartment 4B, Hill View Heights, Sector F-8, Islamabad",
+                    "delivery_instructions": "Call customer upon arrival."
+                },
+                "rider": null,
+                "items": [
+                    {
+                        "id": 38,
+                        "shop_product_id": 363,
+                        "is_catalog_item": true,
+                        "item_name": "Sample Fresh Milk 1L",
+                        "unit_type": "piece",
+                        "item_image": null,
+                        "quantity": 2,
+                        "current_stock": 20,
+                        "unit_price": "280.00",
+                        "line_total": "560.00"
+                    }
+                ],
+                "subtotal": "560.00",
+                "delivery_charges": "0.00",
+                "discount_amount": "0.00",
+                "total_amount": "560.00",
+                "promo_code": null,
+                "cancellation_reason": null,
+                "delivery_proof_image": null,
+                "inventory_reserved_at": null,
+                "estimated_delivery_at": null,
+                "created_at": "2026-10-02T11:29:44+00:00",
+                "updated_at": "2026-10-02T11:29:44+00:00"
+            },
+            "message": "Order details retrieved successfully.",
+            "meta": {}
+        }
+    },
+    "post_seller_order_confirm": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": {
+                "id": 19,
+                "status": "confirmed_by_seller",
+                "status_label": "Confirmed",
+                "status_step": 2,
+                "allowed_actions": [
+                    "prepare",
+                    "reject"
+                ],
+                "customer": {
+                    "name": "Zainab Sample",
+                    "phone": "03001234567",
+                    "address": "Apartment 4B, Hill View Heights, Sector F-8, Islamabad",
+                    "delivery_instructions": "Call customer upon arrival."
+                },
+                "rider": null,
+                "items": [
+                    {
+                        "id": 38,
+                        "shop_product_id": 363,
+                        "is_catalog_item": true,
+                        "item_name": "Sample Fresh Milk 1L",
+                        "unit_type": "piece",
+                        "item_image": null,
+                        "quantity": 2,
+                        "current_stock": 18,
+                        "unit_price": "280.00",
+                        "line_total": "560.00"
+                    }
+                ],
+                "subtotal": "560.00",
+                "delivery_charges": "0.00",
+                "discount_amount": "0.00",
+                "total_amount": "560.00",
+                "promo_code": null,
+                "cancellation_reason": null,
+                "delivery_proof_image": null,
+                "inventory_reserved_at": "2026-10-02T11:29:44+00:00",
+                "estimated_delivery_at": null,
+                "created_at": "2026-10-02T11:29:44+00:00",
+                "updated_at": "2026-10-02T11:29:44+00:00"
+            },
+            "message": "Order confirmed successfully.",
+            "meta": {}
+        }
+    },
+    "post_seller_order_prepare": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": {
+                "id": 19,
+                "status": "preparing",
+                "status_label": "Preparing",
+                "status_step": 3,
+                "allowed_actions": [
+                    "ready",
+                    "reject"
+                ],
+                "customer": {
+                    "name": "Zainab Sample",
+                    "phone": "03001234567",
+                    "address": "Apartment 4B, Hill View Heights, Sector F-8, Islamabad",
+                    "delivery_instructions": "Call customer upon arrival."
+                },
+                "rider": null,
+                "items": [
+                    {
+                        "id": 38,
+                        "shop_product_id": 363,
+                        "is_catalog_item": true,
+                        "item_name": "Sample Fresh Milk 1L",
+                        "unit_type": "piece",
+                        "item_image": null,
+                        "quantity": 2,
+                        "current_stock": 18,
+                        "unit_price": "280.00",
+                        "line_total": "560.00"
+                    }
+                ],
+                "subtotal": "560.00",
+                "delivery_charges": "0.00",
+                "discount_amount": "0.00",
+                "total_amount": "560.00",
+                "promo_code": null,
+                "cancellation_reason": null,
+                "delivery_proof_image": null,
+                "inventory_reserved_at": "2026-10-02T11:29:44+00:00",
+                "estimated_delivery_at": null,
+                "created_at": "2026-10-02T11:29:44+00:00",
+                "updated_at": "2026-10-02T11:29:44+00:00"
+            },
+            "message": "Order is now being prepared.",
+            "meta": {}
+        }
+    },
+    "post_seller_order_ready": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": {
+                "id": 19,
+                "status": "ready_for_pickup",
+                "status_label": "Ready for Pickup",
+                "status_step": 4,
+                "allowed_actions": [],
+                "customer": {
+                    "name": "Zainab Sample",
+                    "phone": "03001234567",
+                    "address": "Apartment 4B, Hill View Heights, Sector F-8, Islamabad",
+                    "delivery_instructions": "Call customer upon arrival."
+                },
+                "rider": null,
+                "items": [
+                    {
+                        "id": 38,
+                        "shop_product_id": 363,
+                        "is_catalog_item": true,
+                        "item_name": "Sample Fresh Milk 1L",
+                        "unit_type": "piece",
+                        "item_image": null,
+                        "quantity": 2,
+                        "current_stock": 18,
+                        "unit_price": "280.00",
+                        "line_total": "560.00"
+                    }
+                ],
+                "subtotal": "560.00",
+                "delivery_charges": "0.00",
+                "discount_amount": "0.00",
+                "total_amount": "560.00",
+                "promo_code": null,
+                "cancellation_reason": null,
+                "delivery_proof_image": null,
+                "inventory_reserved_at": "2026-10-02T11:29:44+00:00",
+                "estimated_delivery_at": null,
+                "created_at": "2026-10-02T11:29:44+00:00",
+                "updated_at": "2026-10-02T11:29:44+00:00"
+            },
+            "message": "Order marked ready for pickup.",
+            "meta": {}
+        }
+    },
+    "post_seller_order_reject": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": {
+                "id": 22,
+                "status": "rejected",
+                "status_label": "Rejected",
+                "status_step": 0,
+                "allowed_actions": [],
+                "customer": {
+                    "name": "Zainab Sample",
+                    "phone": "03001234567",
+                    "address": "Apartment 4B, Hill View Heights, Sector F-8, Islamabad",
+                    "delivery_instructions": null
+                },
+                "rider": null,
+                "items": [
+                    {
+                        "id": 39,
+                        "shop_product_id": 363,
+                        "is_catalog_item": true,
+                        "item_name": "Sample Fresh Milk 1L",
+                        "unit_type": null,
+                        "item_image": null,
+                        "quantity": 1,
+                        "current_stock": 18,
+                        "unit_price": "280.00",
+                        "line_total": "280.00"
+                    }
+                ],
+                "subtotal": "280.00",
+                "delivery_charges": "0.00",
+                "discount_amount": "0.00",
+                "total_amount": "280.00",
+                "promo_code": null,
+                "cancellation_reason": "Item is currently out of stock at this location.",
+                "delivery_proof_image": null,
+                "inventory_reserved_at": null,
+                "estimated_delivery_at": null,
+                "created_at": "2026-10-02T11:29:45+00:00",
+                "updated_at": "2026-10-02T11:29:45+00:00"
+            },
+            "message": "Order rejected successfully.",
+            "meta": {}
+        }
+    },
+    "post_seller_order_complete": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": {
+                "id": 21,
+                "status": "completed",
+                "status_label": "Completed",
+                "status_step": 6,
+                "allowed_actions": [],
+                "customer": {
+                    "name": "Zainab Sample",
+                    "phone": "03001234567",
+                    "address": "Apartment 4B, Hill View Heights, Sector F-8, Islamabad",
+                    "delivery_instructions": null
+                },
+                "rider": {
+                    "id": 7,
+                    "name": "Rashid Sample Rider",
+                    "phone": "03111234567",
+                    "vehicle_type": "Motorcycle"
+                },
+                "items": [],
+                "subtotal": "0.00",
+                "delivery_charges": "0.00",
+                "discount_amount": "0.00",
+                "total_amount": "560.00",
+                "promo_code": null,
+                "cancellation_reason": null,
+                "delivery_proof_image": null,
+                "inventory_reserved_at": null,
+                "estimated_delivery_at": null,
+                "created_at": "2026-10-02T11:29:44+00:00",
+                "updated_at": "2026-10-02T11:30:07+00:00"
+            },
+            "message": "Order completed successfully.",
+            "meta": {}
+        }
+    },
+    "get_seller_operating_hours": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": {
+                "is_open": true,
+                "opens_at": "08:00",
+                "closes_at": "23:00",
+                "is_currently_open": true
+            },
+            "message": "Operating hours retrieved successfully.",
+            "meta": {}
+        }
+    },
+    "put_seller_operating_hours": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": {
+                "is_open": true,
+                "opens_at": "09:00",
+                "closes_at": "22:30",
+                "is_currently_open": true
+            },
+            "message": "Operating hours updated successfully.",
+            "meta": {}
+        }
+    },
+    "get_seller_earnings": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": {
+                "summary": {
+                    "today": "1680.00",
+                    "this_week": "1680.00",
+                    "this_month": "1680.00",
+                    "this_year": "1680.00",
+                    "all_time": "1680.00",
+                    "total_completed_orders": 2
+                },
+                "monthly_chart": [
+                    {
+                        "month_name": "May 2026",
+                        "order_count": 0,
+                        "total_sales": "0.00"
+                    },
+                    {
+                        "month_name": "Jun 2026",
+                        "order_count": 0,
+                        "total_sales": "0.00"
+                    },
+                    {
+                        "month_name": "Jul 2026",
+                        "order_count": 0,
+                        "total_sales": "0.00"
+                    },
+                    {
+                        "month_name": "Aug 2026",
+                        "order_count": 0,
+                        "total_sales": "0.00"
+                    },
+                    {
+                        "month_name": "Sep 2026",
+                        "order_count": 0,
+                        "total_sales": "0.00"
+                    },
+                    {
+                        "month_name": "Oct 2026",
+                        "order_count": 2,
+                        "total_sales": "1680.00"
+                    }
+                ],
+                "discounts_note": "Total sales reflect the final order amounts after customer promo discounts, matching the web earnings calculation."
+            },
+            "message": "Earnings summary retrieved successfully.",
+            "meta": {}
+        }
+    }
+}

@@ -1,0 +1,198 @@
+{
+    "get_customer_profile": {
+        "success": true,
+        "data": {
+            "id": 12,
+            "name": "Ayesha Khan",
+            "email": "ayesha@example.com",
+            "email_verified_at": null,
+            "mobile": null,
+            "address": null,
+            "address2": null,
+            "city": "Karachi",
+            "state": null,
+            "zip": null,
+            "sector": "4A",
+            "near_area": "Ali Chowk",
+            "avatar_url": null,
+            "pickup_time": null,
+            "is_verified": true,
+            "created_at": "2026-10-02T12:59:05+00:00",
+            "updated_at": "2026-10-02T12:59:05+00:00"
+        },
+        "message": "Profile retrieved successfully.",
+        "meta": []
+    },
+    "get_favorite_sellers": {
+        "success": true,
+        "data": [
+            {
+                "id": 50,
+                "name": "Al-Madina Superstore",
+                "profile_image": null,
+                "category": "Groceries",
+                "area": "Gulshan",
+                "sector": "4A",
+                "near_areas": [
+                    "Ali Chowk"
+                ],
+                "opens_at": "08:00:00",
+                "closes_at": "23:00:00",
+                "is_open": true,
+                "accepting_orders": true,
+                "average_rating": 0,
+                "rating_count": 0,
+                "is_favorite": true
+            }
+        ],
+        "message": "Favorite sellers retrieved successfully.",
+        "meta": {
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 15,
+            "total": 1
+        }
+    },
+    "get_favorite_products": {
+        "success": true,
+        "data": [
+            {
+                "listing_id": 371,
+                "global_product_id": 94,
+                "name": "Basmati Rice 5kg",
+                "description": null,
+                "unit_type": "bag",
+                "image": "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=500&auto=format&fit=crop",
+                "price": 1250,
+                "stock_quantity": 15,
+                "in_stock": true,
+                "category": "Groceries",
+                "is_favorite": true
+            }
+        ],
+        "message": "Favorite products retrieved successfully.",
+        "meta": {
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 15,
+            "total": 1
+        }
+    },
+    "toggle_favorite_seller": {
+        "success": true,
+        "data": {
+            "is_favorite": false
+        },
+        "message": "Seller removed from favorites.",
+        "meta": []
+    },
+    "get_customer_notifications": {
+        "success": true,
+        "data": [
+            {
+                "id": "f109f541-05c3-42fa-851f-4c3c1422c1c8",
+                "type": "order_status",
+                "title": "Order #24",
+                "body": "Your order #24 has been confirmed by the seller! \ud83c\udf89",
+                "order_id": "24",
+                "status": "confirmed_by_seller",
+                "created_at": "2026-10-02T12:59:05+00:00",
+                "read_at": null
+            }
+        ],
+        "message": "Notifications retrieved successfully.",
+        "meta": {
+            "current_page": 1,
+            "last_page": 1,
+            "per_page": 15,
+            "total": 1,
+            "unread_count": 1
+        }
+    },
+    "get_reorder_preview": {
+        "success": true,
+        "data": {
+            "order_id": 24,
+            "items": [
+                {
+                    "listing_id": 371,
+                    "name": "Basmati Rice 5kg",
+                    "current_price": "1250.00",
+                    "quantity": 1,
+                    "available_stock": 15,
+                    "ok": true,
+                    "problem_code": null
+                }
+            ],
+            "subtotal": "1250.00",
+            "delivery_fee": "0.00",
+            "total": "1250.00"
+        },
+        "message": "Reorder preview retrieved successfully.",
+        "meta": []
+    },
+    "get_customer_messages": {
+        "success": true,
+        "data": [
+            {
+                "id": 4,
+                "mine": true,
+                "sender_name": "Ayesha",
+                "message": "Hello, please pack properly.",
+                "is_read": true,
+                "created_at": "2026-10-02T12:59:05+00:00"
+            },
+            {
+                "id": 5,
+                "mine": false,
+                "sender_name": "Al-Madina Superstore",
+                "message": "Sure Ayesha, we have verified and packed it.",
+                "is_read": false,
+                "created_at": "2026-10-02T12:59:05+00:00"
+            }
+        ],
+        "message": "Messages retrieved successfully.",
+        "meta": {
+            "unread_count": 1,
+            "last_id": 5,
+            "server_time": "2026-10-02T12:59:05+00:00",
+            "suggested_poll_seconds": 5
+        }
+    },
+    "send_customer_message": {
+        "success": true,
+        "data": {
+            "id": 6,
+            "mine": true,
+            "sender_name": "Ayesha",
+            "message": "Thank you so much!",
+            "is_read": false,
+            "created_at": "2026-10-02T12:59:05+00:00"
+        },
+        "message": "Message sent successfully.",
+        "meta": []
+    },
+    "register_device_token": {
+        "success": true,
+        "data": {
+            "token": "ExponentPushToken[NewToken789]",
+            "platform": "android",
+            "device_name": "Galaxy S23",
+            "last_seen_at": "2026-10-02T12:59:05+00:00"
+        },
+        "message": "Device registered successfully.",
+        "meta": []
+    },
+    "seller_deletion_request": {
+        "success": true,
+        "data": [],
+        "message": "Your account deletion request has been submitted to administration for review.",
+        "meta": []
+    },
+    "forgot_password": {
+        "success": true,
+        "data": [],
+        "message": "If your email is registered, you will receive a password reset OTP shortly.",
+        "meta": []
+    }
+}

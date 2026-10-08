@@ -1,0 +1,220 @@
+/* Seller Edit Service Page Styles */
+
+.edit-service-container {
+    background-color: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: var(--spacing-6);
+    margin-top: var(--spacing-5);
+    margin-bottom: var(--spacing-6);
+    position: relative;
+    overflow: hidden;
+}
+
+.edit-service-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--primary-gradient);
+}
+
+.edit-service-container h2 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: var(--spacing-5);
+    padding-bottom: var(--spacing-3);
+    border-bottom: 1px solid var(--gray-200);
+    position: relative;
+}
+
+.edit-service-container h2::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--primary-gradient);
+    border-radius: var(--radius-sm);
+}
+
+.form-group {
+    margin-bottom: var(--spacing-5);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-2);
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--gray-700);
+    background-color: var(--white);
+    background-clip: padding-box;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    transition: var(--transition-base);
+}
+
+.form-control:focus {
+    color: var(--gray-800);
+    background-color: var(--white);
+    border-color: var(--primary);
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.15);
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-text {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--gray-600);
+}
+
+/* Image Preview Section */
+.current-image {
+    margin: var(--spacing-3) 0;
+    text-align: center;
+    padding: var(--spacing-4);
+    background-color: var(--gray-50);
+    border-radius: var(--radius-md);
+    border: 1px dashed var(--gray-300);
+}
+
+.current-image img {
+    max-width: 200px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-base);
+}
+
+.current-image img:hover {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-md);
+}
+
+.current-image p {
+    margin-top: var(--spacing-3);
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+/* Buttons */
+.button-group {
+    display: flex;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-6);
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    text-align: center;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn i {
+    margin-right: 0.5rem;
+}
+
+.btn-primary {
+    color: var(--white);
+    background: var(--primary-gradient);
+    box-shadow: 0 4px 8px rgba(67, 97, 238, 0.2);
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    color: var(--gray-700);
+    background-color: var(--gray-200);
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+    background-color: var(--gray-300);
+    color: var(--gray-800);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+/* Alert Styles */
+.alert {
+    padding: var(--spacing-4);
+    margin-bottom: var(--spacing-5);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    position: relative;
+}
+
+.alert-danger {
+    color: var(--danger);
+    background-color: var(--danger-light);
+    border-color: var(--danger);
+}
+
+.alert-danger ul {
+    margin-bottom: 0;
+    padding-left: var(--spacing-5);
+}
+
+.alert-danger li {
+    margin-bottom: var(--spacing-2);
+}
+
+.alert-danger li:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .edit-service-container {
+        padding: var(--spacing-5);
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .edit-service-container {
+        padding: var(--spacing-4);
+    }
+    
+    .form-group {
+        margin-bottom: var(--spacing-4);
+    }
+} 

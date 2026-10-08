@@ -1,0 +1,40 @@
+/* Base Styles & Variables - Kept for compatibility with legacy pages */
+:root {
+    --primary-color: #00A651;
+    --primary-dark: #008c44;
+    --primary-light: #e6f7ef;
+    --secondary-color: #1F2937;
+    --accent-color: #F59E0B;
+    --text-color: #374151;
+    --light-text: #6B7280;
+    --light-bg: #F9FAFB;
+    --white: #ffffff;
+    --border-color: #E5E7EB;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Legacy variables mapping */
+    --dark-color: var(--secondary-color);
+    --text-muted: var(--light-text);
+    --light-gray: var(--border-color);
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --success: #10b981;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+    background-color: #f3f4f6;
+    overflow-x: hidden;
+}
+
+/* Helper classes that might be used by JS or legacy components */
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}

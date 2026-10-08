@@ -1,0 +1,153 @@
+
+  GET|HEAD  / ..................................................................... home › HomeController@showHomePage
+  POST      admin/approve-product/{id} ................... admin.approveProduct › Admin\AdminController@approveProduct
+  POST      admin/approve-seller/{id} ...................... admin.approveSeller › Admin\AdminController@approveSeller
+  GET|HEAD  admin/catalog ................................... admin.catalog.index › Admin\AdminCatalogController@index
+  POST      admin/catalog/categories ..... admin.catalog.categories.store › Admin\AdminCatalogController@storeCategory
+  PUT       admin/catalog/categories/{category} admin.catalog.categories.update › Admin\AdminCatalogController@update…
+  POST      admin/catalog/products .......... admin.catalog.products.store › Admin\AdminCatalogController@storeProduct
+  PUT       admin/catalog/products/{product} admin.catalog.products.update › Admin\AdminCatalogController@updateProdu…
+  DELETE    admin/catalog/products/{product} admin.catalog.products.destroy › Admin\AdminCatalogController@destroyPro…
+  GET|HEAD  admin/dashboard ........................................ admin.dashboard › Admin\AdminController@dashboard
+  POST      admin/login-seller/{id} .......................... admin.loginSeller › Admin\AdminController@loginAsSeller
+  GET|HEAD  admin/moderation-queue .................... admin.moderation.queue › Admin\AdminController@moderationQueue
+  POST      admin/moderation-queue/bulk ........... admin.moderation.bulk › Admin\AdminController@bulkModerationAction
+  GET|HEAD  admin/pending-products ............................... admin.pending-products › Admin\AdminController@view
+  GET|HEAD  admin/products ..................................... admin.products › Admin\AdminController@manageProducts
+  POST      admin/promo-codes ......................... admin.promo-codes.store › Admin\AdminController@storePromoCode
+  POST      admin/reject-product/{id} ...................... admin.rejectProduct › Admin\AdminController@rejectProduct
+  POST      admin/reject-seller/{id} ......................... admin.rejectSeller › Admin\AdminController@rejectSeller
+  POST      admin/return-to-admin .......................... admin.returnToAdmin › Admin\AdminController@returnToAdmin
+  GET|HEAD  admin/riders/pending .................................. admin.riders.pending › Admin\RiderController@index
+  POST      admin/riders/{id}/approve ............................ admin.rider.approve › Admin\RiderController@approve
+  POST      admin/riders/{id}/reject ............................... admin.rider.reject › Admin\RiderController@reject
+  GET|HEAD  admin/sellers ........................................ admin.sellers › Admin\AdminController@manageSellers
+  GET|HEAD  admin/settings ........................................... admin.settings › Admin\AdminController@settings
+  GET|HEAD  admin/verifications ....................... admin.verifications.index › Admin\VerificationController@index
+  GET|HEAD  admin/verifications/{verification} .......... admin.verifications.show › Admin\VerificationController@show
+  POST      admin/verifications/{verification}/approve admin.verifications.approve › Admin\VerificationController@app…
+  POST      admin/verifications/{verification}/reject admin.verifications.reject › Admin\VerificationController@reject
+  POST      api/v1/admin/auth/login ............................................ Api\V1\Auth\AdminAuthController@login
+  POST      api/v1/admin/auth/logout .......................................... Api\V1\Auth\AdminAuthController@logout
+  GET|HEAD  api/v1/admin/auth/me .................................................. Api\V1\Auth\AdminAuthController@me
+  POST      api/v1/customer/auth/login ...................................... Api\V1\Auth\CustomerAuthController@login
+  POST      api/v1/customer/auth/logout .................................... Api\V1\Auth\CustomerAuthController@logout
+  GET|HEAD  api/v1/customer/auth/me ............................................ Api\V1\Auth\CustomerAuthController@me
+  POST      api/v1/customer/auth/register ................................ Api\V1\Auth\CustomerAuthController@register
+  POST      api/v1/customer/auth/resend-otp ............................. Api\V1\Auth\CustomerAuthController@resendOtp
+  POST      api/v1/customer/auth/verify-otp ............................. Api\V1\Auth\CustomerAuthController@verifyOtp
+  POST      api/v1/customer/cart/validate ....................... Api\V1\Customer\CustomerOrderController@validateCart
+  POST      api/v1/customer/checkout/apply-promo .................. Api\V1\Customer\CustomerOrderController@applyPromo
+  GET|HEAD  api/v1/customer/home ....................................... Api\V1\Customer\CustomerBrowseController@home
+  GET|HEAD  api/v1/customer/meta/locations ........................ Api\V1\Customer\CustomerBrowseController@locations
+  POST      api/v1/customer/orders ................................ Api\V1\Customer\CustomerOrderController@placeOrder
+  GET|HEAD  api/v1/customer/orders/active ....................... Api\V1\Customer\CustomerOrderController@activeOrders
+  GET|HEAD  api/v1/customer/orders/history ...................... Api\V1\Customer\CustomerOrderController@orderHistory
+  GET|HEAD  api/v1/customer/orders/{order} .............................. Api\V1\Customer\CustomerOrderController@show
+  POST      api/v1/customer/orders/{order}/cancel ..................... Api\V1\Customer\CustomerOrderController@cancel
+  POST      api/v1/customer/orders/{order}/feedback ................. Api\V1\Customer\CustomerOrderController@feedback
+  GET|HEAD  api/v1/customer/search ................................... Api\V1\Customer\CustomerBrowseController@search
+  GET|HEAD  api/v1/customer/sellers/{seller} ................... Api\V1\Customer\CustomerBrowseController@sellerDetail
+  GET|HEAD  api/v1/customer/sellers/{seller}/products/{listing} Api\V1\Customer\CustomerBrowseController@productDetail
+  GET|HEAD  api/v1/customer/sellers/{seller}/reviews ................ Api\V1\Customer\CustomerBrowseController@reviews
+  POST      api/v1/rider/auth/login ............................................ Api\V1\Auth\RiderAuthController@login
+  POST      api/v1/rider/auth/logout .......................................... Api\V1\Auth\RiderAuthController@logout
+  GET|HEAD  api/v1/rider/auth/me .................................................. Api\V1\Auth\RiderAuthController@me
+  POST      api/v1/rider/auth/register ...................................... Api\V1\Auth\RiderAuthController@register
+  GET|HEAD  api/v1/rider/dashboard ....................................... Api\V1\Rider\RiderOrderController@dashboard
+  GET|HEAD  api/v1/rider/history ........................................... Api\V1\Rider\RiderOrderController@history
+  GET|HEAD  api/v1/rider/orders/available .......................... Api\V1\Rider\RiderOrderController@availableOrders
+  GET|HEAD  api/v1/rider/orders/current .............................. Api\V1\Rider\RiderOrderController@currentOrders
+  GET|HEAD  api/v1/rider/orders/{order} ....................................... Api\V1\Rider\RiderOrderController@show
+  POST      api/v1/rider/orders/{order}/accept .............................. Api\V1\Rider\RiderOrderController@accept
+  POST      api/v1/rider/orders/{order}/deliver ............................ Api\V1\Rider\RiderOrderController@deliver
+  POST      api/v1/rider/orders/{order}/pickup .............................. Api\V1\Rider\RiderOrderController@pickup
+  POST      api/v1/rider/status ....................................... Api\V1\Rider\RiderOrderController@updateStatus
+  POST      api/v1/seller/auth/login .......................................... Api\V1\Auth\SellerAuthController@login
+  POST      api/v1/seller/auth/logout ........................................ Api\V1\Auth\SellerAuthController@logout
+  GET|HEAD  api/v1/seller/auth/me ................................................ Api\V1\Auth\SellerAuthController@me
+  POST      api/v1/seller/auth/register .................................... Api\V1\Auth\SellerAuthController@register
+  GET|POST|HEAD broadcasting/auth ......................... Illuminate\Broadcasting › BroadcastController@authenticate
+  GET|HEAD  cart ................................................................. cart.view › CartController@viewCart
+  POST      cart/add ................................................................... cart.add › CartController@add
+  POST      cart/remove .......................................................... cart.remove › CartController@remove
+  POST      cart/update .......................................................... cart.update › CartController@update
+  GET|HEAD  chat/{order} ......................................................... chat.index › MessageController@chat
+  GET|HEAD  chat/{order}/messages .................................. chat.get-messages › MessageController@getMessages
+  POST      chat/{order}/read .......................................... chat.mark-read › MessageController@markAsRead
+  POST      chat/{order}/send ..................................................... chat.send › MessageController@send
+  GET|HEAD  checkout .................................................... checkout.show › OrderController@showCheckout
+  POST      checkout ..................................................... checkout.place › OrderController@placeOrder
+  POST      checkout/promo ............................................... checkout.promo › OrderController@applyPromo
+  POST      favorites/products/{listing} ................ favorites.products.toggle › FavoriteController@toggleProduct
+  POST      favorites/sellers/{seller} .................... favorites.sellers.toggle › FavoriteController@toggleSeller
+  GET|HEAD  login ............................................................... login › AuthController@showLoginForm
+  POST      login ............................................................................... AuthController@login
+  POST      logout .................................................................... logout › AuthController@logout
+  GET|HEAD  notifications ......................................... notifications.index › NotificationController@index
+  POST      notifications/mark-all-as-read ........ notifications.markAllAsRead › NotificationController@markAllAsRead
+  POST      notifications/mark-as-read .................. notifications.markAsRead › NotificationController@markAsRead
+  GET|HEAD  notifications/{id}/redirect ............ notifications.redirect › NotificationController@redirectToService
+  GET|HEAD  order/history .................................................... order.history › OrderController@history
+  GET|HEAD  order/track/{order} ...................................... order.track.legacy › OrderController@trackOrder
+  GET|HEAD  order/{id} ............................................................. order.show › OrderController@show
+  GET|HEAD  order/{id}/feedback ............................................ order.feedback › OrderController@feedback
+  POST      order/{id}/feedback ............................... order.feedback.submit › OrderController@submitFeedback
+  POST      order/{order}/accept-reject ....................... order.acceptReject › OrderController@acceptRejectOrder
+  GET|HEAD  orders ............................................................. order.all › OrderController@allOrders
+  POST      orders/{order}/buy-again ....................................... order.buyAgain › OrderController@buyAgain
+  POST      orders/{order}/cancel .............................................. order.cancel › OrderController@cancel
+  GET|HEAD  orders/{order}/track ................................................. order.track › OrderController@track
+  GET|HEAD  products/{id} ............................................... service.show › ProductController@showProduct
+  GET|HEAD  profile ............................................................ profile.edit › ProfileController@edit
+  POST      profile ........................................................ profile.update › ProfileController@update
+  GET|HEAD  register ...................................................... register › AuthController@showRegisterForm
+  POST      register ......................................................................... AuthController@register
+  GET|HEAD  rider/available-orders .......................... rider.available-orders › RiderController@availableOrders
+  GET|HEAD  rider/dashboard .............................................. rider.dashboard › RiderController@dashboard
+  GET|HEAD  rider/login .............................................. rider.login › RiderAuthController@showLoginForm
+  POST      rider/login .................................................................... RiderAuthController@login
+  POST      rider/logout ................................................... rider.logout › RiderAuthController@logout
+  POST      rider/order/{order}/accept .............................. rider.order.accept › RiderController@acceptOrder
+  POST      rider/order/{order}/update-status ............... rider.order.update-status › RiderController@updateStatus
+  GET|HEAD  rider/register ..................................... rider.register › RiderAuthController@showRegisterForm
+  POST      rider/register .............................................................. RiderAuthController@register
+  POST      rider/toggle-status ................................... rider.toggle-status › RiderController@toggleStatus
+  GET|HEAD  sanctum/csrf-cookie .................... sanctum.csrf-cookie › Laravel\Sanctum › CsrfCookieController@show
+  GET|HEAD  search-products ....................................... search.services › ProductController@searchProducts
+  GET|HEAD  seller-panel ................................................. seller.panel › SellerController@sellerPanel
+  GET|HEAD  seller/add-product .............................. add.service › SellerProductController@showAddProductForm
+  POST      seller/add-product .................................. store.service › SellerProductController@storeProduct
+  GET|HEAD  seller/catalog ...................................... seller.catalog.index › SellerCatalogController@index
+  POST      seller/catalog/bulk-update ............... seller.catalog.bulk-update › SellerCatalogController@bulkUpdate
+  POST      seller/catalog/import .............. seller.catalog.import › SellerCatalogController@importCategoryCatalog
+  PUT       seller/catalog/listings/{listing} . seller.catalog.listings.update › SellerCatalogController@updateListing
+  GET|HEAD  seller/chat/{order} ........................................... seller.chat.index › MessageController@chat
+  GET|HEAD  seller/chat/{order}/messages .................... seller.chat.get-messages › MessageController@getMessages
+  POST      seller/chat/{order}/read ............................ seller.chat.mark-read › MessageController@markAsRead
+  POST      seller/chat/{order}/send ....................................... seller.chat.send › MessageController@send
+  DELETE    seller/delete-product/{id} ......................... seller.deleteService › SellerProductController@delete
+  GET|HEAD  seller/earnings .............................................. seller.earnings › SellerController@earnings
+  GET|HEAD  seller/edit-product/{id} ............................... seller.editService › SellerProductController@edit
+  GET|HEAD  seller/login ............................................... login.seller › SellerController@showLoginForm
+  POST      seller/login ...................................................................... SellerController@login
+  POST      seller/logout .................................................... logout.seller › SellerController@logout
+  POST      seller/operating-hours ............. seller.operating-hours.update › SellerController@updateOperatingHours
+  GET|HEAD  seller/order/{order}/handle ............................ seller.order.handle › OrderController@handleOrder
+  POST      seller/order/{order}/update-status ................ order.updateStatus › OrderController@updateOrderStatus
+  PUT       seller/products/{id} ............................... seller.updateService › SellerProductController@update
+  GET|HEAD  seller/register ...................................... register.seller › SellerController@showRegisterForm
+  POST      seller/register ................................................................ SellerController@register
+  GET|HEAD  seller/verification/apply .. seller.verification.apply › SellerVerificationController@showVerificationForm
+  GET|HEAD  seller/verification/status seller.verification.status › SellerVerificationController@showVerificationStat…
+  POST      seller/verification/submit seller.verification.submit › SellerVerificationController@submitVerificationRe…
+  GET|HEAD  sellers/{sellerId}/services ................ sellers.services.alias › ProductController@showSellerProducts
+  GET|HEAD  sellers/{seller} ................................. sellers.services › ProductController@showSellerProducts
+  GET|HEAD  sellers/{seller}/products/{listing} .......... catalog.product.show › ProductController@showCatalogProduct
+  GET|HEAD  storage/{path} ............................................................................. storage.local
+  GET|HEAD  up ....................................................................................................... 
+  GET|HEAD  verify-otp ....................................................... verify.otp › AuthController@showOtpForm
+  POST      verify-otp ...................................................................... AuthController@verifyOtp
+
+                                                                                                  Showing [149] routes
+

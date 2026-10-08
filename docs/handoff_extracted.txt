@@ -1,0 +1,1117 @@
+Listed directory bakalaexpressbackend
+Viewed composer.json:1-74
+Viewed package.json:1-23
+Viewed .env.example:1-88
+Listed directory routes
+Viewed api.php:1-5
+Viewed channels.php:1-44
+Viewed web.php:1-206
+Viewed app.php:1-26
+Viewed auth.php:1-117
+Viewed RoleMiddleware.php:1-67
+Viewed AdminMiddleware.php:1-28
+Viewed EnsureRiderIsApproved.php:1-33
+Listed directory Controllers
+Listed directory admin
+Listed directory Models
+Listed directory migrations
+Listed directory app
+Listed directory Events
+Listed directory Notifications
+Listed directory Services
+Listed directory Support
+Listed directory Jobs
+Listed directory Mail
+Listed directory Observers
+Viewed test
+Viewed AuthController.php:1-167
+Viewed RiderAuthController.php:1-109
+Viewed SellerController.php:1-304
+Viewed OrderController.php:1-250
+Viewed OrderController.php:251-500
+Viewed OrderController.php:501-762
+Viewed RiderController.php:1-136
+Viewed MessageController.php:1-134
+Viewed CartController.php:1-150
+Viewed CartController.php:151-287
+Viewed ProductController.php:1-125
+Viewed HomeController.php:1-96
+Viewed ProfileController.php:1-65
+Viewed FavoriteController.php:1-40
+Viewed NotificationController.php:1-45
+Viewed SellerProductController.php:1-105
+Viewed SellerCatalogController.php:1-165
+Viewed SellerVerificationController.php:1-117
+Viewed AdminController.php:1-250
+Viewed AdminController.php:251-436
+Viewed AdminCatalogController.php:1-146
+Viewed RiderController.php:1-56
+Viewed VerificationController.php:1-90
+Viewed User.php:1-77
+Viewed Seller.php:1-150
+Viewed Rider.php:1-53
+Viewed Admin.php:1-20
+Viewed Order.php:1-100
+Viewed OrderItem.php:1-45
+Viewed Product.php:1-32
+Viewed GlobalProduct.php:1-101
+Viewed ShopProduct.php:1-47
+Viewed PromoCode.php:1-53
+Viewed CatalogCategory.php:1-44
+Viewed Message.php:1-18
+Viewed Feedback.php:1-31
+Viewed Favorite.php:1-15
+Viewed SellerVerification.php:1-56
+Viewed UserProfileUpdate.php:1-18
+Viewed bakalaexpressapi.sql:1-250
+Viewed bakalaexpressapi.sql:251-550
+Viewed bakalaexpressapi.sql:551-750
+Viewed bakalaexpressapi.sql:751-1004
+Viewed 2026_07_21_100000_add_delivery_instructions_to_orders_table.php:1-25
+Viewed SanitizedImageUpload.php:1-55
+Viewed SyncProductPriceUpdate.php:1-35
+Viewed SellerObserver.php:1-39
+Viewed OrderStatusNotification.php:1-90
+Viewed NewOrderNotification.php:1-61
+Viewed NewServiceAddedNotification.php:1-46
+Viewed ServiceApprovedNotification.php:1-69
+Viewed OrderReadyForPickup.php:1-53
+Viewed NewMessage.php:1-55
+Listed directory Providers
+Viewed AppServiceProvider.php:1-33
+Listed directory Requests
+Viewed RegisterUserRequest.php:1-48
+Viewed StoreProductRequest.php:1-32
+Viewed services.php:1-43
+Viewed broadcasting.php:1-35
+Viewed filesystems.php:1-60
+Viewed sanctum.php:1-83
+
+# Bakala Express — Backend Analysis & Mobile App Handoff Document
+
+> **System Purpose:** Hyper-local grocery & essentials delivery platform serving neighborhood clusters (initially Baldia Town, Karachi). Built around a three-tier marketplace model: **Customers (Buyers)**, **Merchants (Sellers)**, and **Delivery Partners (Riders)**, governed by an **Administrator**.
+
+---
+
+## 1. Tech Stack & Version Matrix
+
+| Layer / Dependency | Version / Specification | Location / Reference | Notes |
+| :--- | :--- | :--- | :--- |
+| **PHP Runtime** | `^8.2` (Environment tested on 8.3/8.4) | `composer.json` | Requires `ext-gd` for image sanitization |
+| **Framework** | **Laravel 11.9+** | `composer.json` | Uses Laravel 11 bootstrap (`bootstrap/app.php`) |
+| **Database** | **MySQL 8.4+ / MariaDB** (InnoDB) | `config/database.php` | Charset: `utf8mb4_unicode_ci` |
+| **Token Auth Engine**| **Laravel Sanctum 4.2** | `composer.json` | Installed & migrated; models have `HasApiTokens` |
+| **Realtime Engine** | **Pusher Channels** (PHP Server `^7.2`) | `composer.json`, `config/broadcasting.php` | Fallback to HTTP polling in chat |
+| **CLI & Queue** | Laravel Tinker 2.9, Laravel Pail 1.1 | `composer.json` | Sync/Database queue drivers supported |
+| **Testing** | PHPUnit 11.0.1, Mockery 1.6 | `composer.json` | PHPUnit XML configuration present |
+| **Frontend Assets** | Vite 5.0, TailwindCSS 3.4.13, PostCSS | `package.json` | Blade/Mix legacy assets also bundled |
+| **Client Realtime** | Laravel Echo 2.0.2, Pusher-JS 8.4.0 | `package.json` | Web channel listeners |
+
+### Production Dependencies (`composer.json`)
+- `php: ^8.2`
+- `laravel/framework: ^11.9`
+- `laravel/sanctum: ^4.2`
+- `laravel/tinker: ^2.9`
+- `laravel/ui: *`
+- `pusher/pusher-php-server: ^7.2`
+
+### Development Dependencies (`composer.json`)
+- `fakerphp/faker: ^1.23`
+- `laravel/pail: ^1.1`
+- `laravel/pint: ^1.13`
+- `laravel/sail: ^1.26`
+- `mockery/mockery: ^1.6`
+- `nunomaduro/collision: ^8.1`
+- `phpunit/phpunit: ^11.0.1`
+
+### JavaScript / Build Dependencies (`package.json`)
+- **Runtime:** `laravel-echo (^2.0.2)`, `pusher-js (^8.4.0)`
+- **Dev:** `vite (^5.0)`, `laravel-vite-plugin (^1.0)`, `tailwindcss (^3.4.13)`, `autoprefixer (^10.4.20)`, `axios (^1.7.4)`, `concurrently (^9.0.1)`, `laravel-mix (^6.0.49)`, `postcss (^8.4.47)`
+
+---
+
+## 2. User Roles & Access Control
+
+The system implements a **multi-guard, multi-role** authentication and authorization model across three dedicated database tables (`users`, `sellers`, `riders`), resolved via `App\Http\Middleware\RoleMiddleware`.
+
+```
+                    +-----------------------+
+                    |    RoleMiddleware     |
+                    +-----------+-----------+
+                                |
+        +-----------------------+-----------------------+
+        |                       |                       |
++-------v-------+       +-------v-------+       +-------v-------+
+|  User Guard   |       |  Seller Guard |       |  Rider Guard  |
+|  table: users |       | table: sellers|       | table: riders |
++-------+-------+       +---------------+       +---------------+
+        |
+  [sellerType]
+   |        |
+   |        +---> sellerType == 1: Admin
+   +------------> sellerType == 2: Buyer / Customer
+```
+
+### Role Breakdown
+
+| Role | Guard & Table | Authorization Criterion | Core Capabilities |
+| :--- | :--- | :--- | :--- |
+| **Customer (Buyer)** | Guard: `web`<br>Table: `users` | `Auth::guard('web')->check()` && `user->sellerType != 1` (default: `2`) | - Register with 6-digit email OTP<br>- Browse verified, open shops by sector/landmark<br>- Search products across shops and categories<br>- Maintain single-seller cart with stock validation<br>- Apply promo codes & checkout (COD / online)<br>- Real-time order tracking & order cancellation<br>- Buy again (1-click reorder into cart)<br>- Order-based chat with seller<br>- Order feedback and 1-5 star ratings<br>- Favorite/bookmark shops and products |
+| **Seller (Merchant)**| Guard: `seller`<br>Table: `sellers` | `Auth::guard('seller')->check()` && `seller->accountIsApproved == 1` | - Register shop (sector, near areas, category)<br>- Await admin approval (`accountIsApproved`)<br>- Submit verification documents for KYC<br>- Configure operating hours (`opens_at`, `closes_at`, `is_open`)<br>- Import master catalog products into shop inventory<br>- Set custom prices, update stock levels, toggle availability<br>- Bulk adjust prices (% markup / markdown or reset to base)<br>- Manage incoming orders: Accept, Prepare, Ready for Pickup<br>- Chat with buyer regarding an active order<br>- View earnings report (all-time, week, month, year) with 6-month chart |
+| **Rider (Delivery Partner)**| Guard: `rider`<br>Table: `riders` | `Auth::guard('rider')->check()` && `rider->is_approved == 1` | - Register with vehicle details, CNIC & document uploads<br>- Await admin document verification (`is_approved`)<br>- Toggle online/offline shift status<br>- View available orders ready for pickup (`ready_for_pickup`)<br>- Claim/accept an order (`assigned_to_rider`)<br>- Update delivery status (`picked_up`, `delivered`)<br>- Upload delivery proof photo on completion<br>- View daily completed order count and delivery earnings |
+| **Administrator** | Guard: `web`<br>Table: `users` | `Auth::guard('web')->check()` && `user->sellerType == 1` | - Dashboard analytics (gross revenue, order counts, 7-day volume chart)<br>- Unified moderation queue for pending sellers, riders, products, and reviews<br>- Manage master product catalog (categories, global products, base prices)<br>- Dispatch background price sync job (`SyncProductPriceUpdate`)<br>- Manage promo codes (fixed/percentage, min order, usage caps)<br>- Review and approve/reject seller verification applications<br>- Cryptographically signed seller impersonation (`loginAsSeller`) and return-to-admin |
+
+---
+
+## 3. Complete Route Directory
+
+Every route currently registered in the application (`routes/web.php` and `routes/api.php`):
+
+| HTTP Method | URI Pattern | Controller Action | Purpose | Auth & Middleware |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/` | `HomeController@showHomePage` | Homepage storefront: seller listings, feedbacks, filters | Public (redirects if auth) |
+| `GET` | `/login` | `AuthController@showLoginForm` | Show buyer login form | Public (Guest) |
+| `POST` | `/login` | `AuthController@login` | Authenticate customer or admin | `throttle:10,1` |
+| `GET` | `/register` | `AuthController@showRegisterForm` | Show buyer registration form | Public (Guest) |
+| `POST` | `/register` | `AuthController@register` | Create customer, generate OTP, send email | `throttle:5,1` |
+| `GET` | `/verify-otp` | `AuthController@showOtpForm` | Show OTP submission page | Session-dependent |
+| `POST` | `/verify-otp` | `AuthController@verifyOtp` | Verify 6-digit email OTP | `throttle:5,1` |
+| `POST` | `/logout` | `AuthController@logout` | Customer session logout | `auth` |
+| `GET` | `/seller/register` | `SellerController@showRegisterForm`| Seller registration form | Public (Guest) |
+| `POST` | `/seller/register` | `SellerController@register` | Create unapproved seller record | `throttle:5,1` |
+| `GET` | `/seller/login` | `SellerController@showLoginForm` | Seller login form | Public (Guest) |
+| `POST` | `/seller/login` | `SellerController@login` | Authenticate seller & check approval | `throttle:10,1` |
+| `POST` | `/seller/logout` | `SellerController@logout` | Seller session logout | `auth:seller` |
+| `GET` | `/seller-panel` | `SellerController@sellerPanel` | Main merchant dashboard | `auth:seller`, `role:seller` |
+| `GET` | `/seller/earnings` | `SellerController@earnings` | Merchant revenue & order analytics | `auth:seller`, `role:seller` |
+| `POST` | `/seller/operating-hours` | `SellerController@updateOperatingHours` | Set store open/close hours and open toggle | `auth:seller`, `role:seller` |
+| `GET` | `/seller/catalog` | `SellerCatalogController@index` | Manage seller shop products | `auth:seller`, `role:seller` |
+| `POST` | `/seller/catalog/import` | `SellerCatalogController@importCategoryCatalog` | Import category master catalog items | `auth:seller`, `role:seller` |
+| `POST` | `/seller/catalog/bulk-update` | `SellerCatalogController@bulkUpdate` | Bulk adjust custom prices (% or reset) | `auth:seller`, `role:seller` |
+| `PUT` | `/seller/catalog/listings/{listing}` | `SellerCatalogController@updateListing`| Update price, stock, active status | `auth:seller`, `role:seller` |
+| `GET` | `/seller/add-product` | `SellerProductController@showAddProductForm` | Form for custom/legacy product | `auth:seller`, `role:seller` |
+| `POST` | `/seller/add-product` | `SellerProductController@storeProduct` | Save custom product for admin review | `auth:seller`, `role:seller` |
+| `GET` | `/seller/edit-product/{id}` | `SellerProductController@edit` | Edit custom product | `auth:seller`, `role:seller` |
+| `PUT` | `/seller/products/{id}` | `SellerProductController@update` | Update custom product details | `auth:seller`, `role:seller` |
+| `DELETE`| `/seller/delete-product/{id}` | `SellerProductController@delete` | Delete custom product | `auth:seller`, `role:seller` |
+| `GET` | `/seller/verification/apply` | `SellerVerificationController@showVerificationForm` | KYC application form | `auth:seller`, `role:seller` |
+| `POST` | `/seller/verification/submit`| `SellerVerificationController@submitVerificationRequest` | Submit verification documents | `auth:seller`, `role:seller` |
+| `GET` | `/seller/verification/status`| `SellerVerificationController@showVerificationStatus` | View verification review state | `auth:seller`, `role:seller` |
+| `GET` | `/rider/login` | `RiderAuthController@showLoginForm` | Rider login form | Public (Guest) |
+| `POST` | `/rider/login` | `RiderAuthController@login` | Rider login & verification check | `throttle:10,1` |
+| `GET` | `/rider/register` | `RiderAuthController@showRegisterForm`| Rider registration form | Public (Guest) |
+| `POST` | `/rider/register` | `RiderAuthController@register` | Create rider with documents | `throttle:5,1` |
+| `POST` | `/rider/logout` | `RiderAuthController@logout` | Rider session logout | `auth:rider` |
+| `GET` | `/rider/dashboard` | `RiderController@dashboard` | Rider shift dashboard | `auth:rider`, `role:rider`, `approved_rider` |
+| `POST` | `/rider/toggle-status` | `RiderController@toggleStatus` | Toggle online/offline | `auth:rider`, `role:rider`, `approved_rider` |
+| `GET` | `/rider/available-orders` | `RiderController@availableOrders` | Get orders waiting for pickup | `auth:rider`, `role:rider`, `approved_rider` |
+| `POST` | `/rider/order/{order}/accept` | `RiderController@acceptOrder` | Claim delivery order | `auth:rider`, `role:rider`, `approved_rider` |
+| `POST` | `/rider/order/{order}/update-status` | `RiderController@updateStatus` | Mark order picked up / delivered | `auth:rider`, `role:rider`, `approved_rider` |
+| `GET` | `/admin/dashboard` | `AdminController@dashboard` | Platform metrics & charts | `auth`, `role:admin` |
+| `GET` | `/admin/moderation-queue`| `AdminController@moderationQueue` | Tabbed approval queue | `auth`, `role:admin` |
+| `POST` | `/admin/moderation-queue/bulk` | `AdminController@bulkModerationAction` | Bulk approve/reject items | `auth`, `role:admin` |
+| `POST` | `/admin/approve-seller/{id}` | `AdminController@approveSeller` | Approve seller account | `auth`, `role:admin` |
+| `POST` | `/admin/reject-seller/{id}` | `AdminController@rejectSeller` | Soft-delete seller | `auth`, `role:admin` |
+| `GET` | `/admin/pending-products`| `AdminController@view` | List pending custom products | `auth`, `role:admin` |
+| `POST` | `/admin/approve-product/{id}`| `AdminController@approveProduct` | Approve custom product | `auth`, `role:admin` |
+| `POST` | `/admin/reject-product/{id}` | `AdminController@rejectProduct` | Reject custom product | `auth`, `role:admin` |
+| `GET` | `/admin/catalog` | `AdminCatalogController@index` | Global catalog manager | `auth`, `role:admin` |
+| `POST` | `/admin/catalog/categories` | `AdminCatalogController@storeCategory`| Add master category | `auth`, `role:admin` |
+| `PUT` | `/admin/catalog/categories/{category}` | `AdminCatalogController@updateCategory` | Update master category | `auth`, `role:admin` |
+| `POST` | `/admin/catalog/products` | `AdminCatalogController@storeProduct` | Add global master product | `auth`, `role:admin` |
+| `PUT` | `/admin/catalog/products/{product}` | `AdminCatalogController@updateProduct` | Update global product & sync price | `auth`, `role:admin` |
+| `DELETE`| `/admin/catalog/products/{product}`| `AdminCatalogController@destroyProduct` | Delete global product | `auth`, `role:admin` |
+| `GET` | `/admin/sellers` | `AdminController@manageSellers` | View all sellers list | `auth`, `role:admin` |
+| `GET` | `/admin/products` | `AdminController@manageProducts` | View all custom products | `auth`, `role:admin` |
+| `GET` | `/admin/settings` | `AdminController@settings` | View promo codes settings | `auth`, `role:admin` |
+| `POST` | `/admin/promo-codes` | `AdminController@storePromoCode` | Create new promo coupon | `auth`, `role:admin` |
+| `POST` | `/admin/login-seller/{id}` | `AdminController@loginAsSeller` | Impersonate merchant account | `auth`, `role:admin` |
+| `POST` | `/admin/return-to-admin` | `AdminController@returnToAdmin` | End merchant impersonation | `auth`, `role:admin` |
+| `GET` | `/admin/verifications` | `VerificationController@index` | List seller KYC applications | `auth`, `role:admin` |
+| `GET` | `/admin/verifications/{verification}` | `VerificationController@show` | View KYC application details | `auth`, `role:admin` |
+| `POST` | `/admin/verifications/{verification}/approve`| `VerificationController@approve` | Approve seller KYC | `auth`, `role:admin` |
+| `POST` | `/admin/verifications/{verification}/reject` | `VerificationController@reject` | Reject seller KYC | `auth`, `role:admin` |
+| `GET` | `/admin/riders/pending` | `Admin\RiderController@index` | List unapproved riders | `auth`, `role:admin` |
+| `POST` | `/admin/riders/{id}/approve` | `Admin\RiderController@approve` | Approve rider partner | `auth`, `role:admin` |
+| `POST` | `/admin/riders/{id}/reject` | `Admin\RiderController@reject` | Reject / delete rider partner | `auth`, `role:admin` |
+| `GET` | `/profile` | `ProfileController@edit` | View customer profile | `auth` |
+| `POST` | `/profile` | `ProfileController@update` | Update profile info & avatar | `auth` |
+| `GET` | `/notifications` | `NotificationController@index` | View customer notifications | `auth`, `role:user` |
+| `POST` | `/notifications/mark-as-read`| `NotificationController@markAsRead` | Mark unread as read | `auth`, `role:user` |
+| `GET` | `/notifications/{id}/redirect`| `NotificationController@redirectToService` | Mark single read & redirect | `auth`, `role:user` |
+| `POST` | `/notifications/mark-all-as-read`| `NotificationController@markAllAsRead` | Mark all read | `auth`, `role:user` |
+| `GET` | `/sellers/{seller}` | `ProductController@showSellerProducts` | View storefront catalog & ratings | Public |
+| `GET` | `/sellers/{sellerId}/services` | `ProductController@showSellerProducts` | Alias for storefront | Public |
+| `GET` | `/sellers/{seller}/products/{listing}` | `ProductController@showCatalogProduct` | View single catalog item detail | Public |
+| `GET` | `/products/{id}` | `ProductController@showProduct` | View single legacy product | Public |
+| `GET` | `/search-products` | `ProductController@searchProducts` | Live search products across shops | Public |
+| `POST` | `/cart/add` | `CartController@add` | Add item to session cart | Session |
+| `GET` | `/cart` | `CartController@viewCart` | Render cart view | Session |
+| `POST` | `/cart/update` | `CartController@update` | Update cart item quantity | Session |
+| `POST` | `/cart/remove` | `CartController@remove` | Remove item from cart | Session |
+| `GET` | `/checkout` | `OrderController@showCheckout` | Render checkout page | `auth`, `role:user` |
+| `POST` | `/checkout/promo` | `OrderController@applyPromo` | Apply or clear promo coupon | `auth`, `role:user` |
+| `POST` | `/checkout` | `OrderController@placeOrder` | Submit order (catalog / legacy) | `auth`, `role:user` |
+| `GET` | `/orders/{order}/track` | `OrderController@track` | Realtime order tracking screen | `auth`, `role:user` |
+| `GET` | `/order/track/{order}` | `OrderController@trackOrder` | Legacy tracking route | `auth`, `role:user` |
+| `POST` | `/order/{order}/accept-reject` | `OrderController@acceptRejectOrder` | Seller accept/reject order | `auth`, `role:user` *(bug)* |
+| `POST` | `/orders/{order}/buy-again` | `OrderController@buyAgain` | Re-populate cart from past order | `auth`, `role:user` |
+| `POST` | `/orders/{order}/cancel` | `OrderController@cancel` | Customer cancel order | `auth`, `role:user` |
+| `GET` | `/order/history` | `OrderController@history` | Completed/delivered orders list | `auth`, `role:user` |
+| `GET` | `/order/{id}` | `OrderController@show` | Customer order invoice/details | `auth`, `role:user` |
+| `GET` | `/orders` | `OrderController@allOrders` | Active orders list | `auth`, `role:user` |
+| `POST` | `/favorites/sellers/{seller}` | `FavoriteController@toggleSeller` | Bookmark / unbookmark seller | `auth`, `role:user` |
+| `POST` | `/favorites/products/{listing}` | `FavoriteController@toggleProduct` | Bookmark / unbookmark product | `auth`, `role:user` |
+| `GET` | `/seller/order/{order}/handle` | `OrderController@handleOrder` | Merchant order action screen | `auth:seller`, `role:seller` |
+| `POST` | `/seller/order/{order}/update-status` | `OrderController@updateOrderStatus` | Transition order status | `auth:seller`, `role:seller` |
+| `GET` | `/chat/{order}` | `MessageController@chat` | Customer chat screen | `auth`, `role:user` |
+| `POST` | `/chat/{order}/send` | `MessageController@send` | Send message as customer | `auth`, `role:user` |
+| `POST` | `/chat/{order}/read` | `MessageController@markAsRead` | Mark seller messages as read | `auth`, `role:user` |
+| `GET` | `/chat/{order}/messages` | `MessageController@getMessages` | Poll messages with `?since=` | `auth`, `role:user` |
+| `GET` | `/seller/chat/{order}` | `MessageController@chat` | Seller chat screen | `auth:seller`, `role:seller` |
+| `POST` | `/seller/chat/{order}/send` | `MessageController@send` | Send message as seller | `auth:seller`, `role:seller` |
+| `POST` | `/seller/chat/{order}/read` | `MessageController@markAsRead` | Mark buyer messages as read | `auth:seller`, `role:seller` |
+| `GET` | `/seller/chat/{order}/messages` | `MessageController@getMessages` | Poll messages as seller | `auth:seller`, `role:seller` |
+| `GET` | `/order/{id}/feedback` | `OrderController@feedback` | Customer review form | Public |
+| `POST` | `/order/{id}/feedback` | `OrderController@submitFeedback` | Save order rating & review | Public *(uses auth internally)* |
+
+---
+
+## 4. Response Format Analysis & Mobile API Migration Plan
+
+### 4.1. Currently Returning JSON (Ready for Mobile with minor formatting)
+Only **4 controllers** contain methods that currently return JSON responses:
+1. `GET /search-products` (`ProductController@searchProducts`): Returns `{ products: [...] }` with `shop_product_id`, `seller_id`, `name`, `price`, `stock_quantity`.
+2. `GET /rider/available-orders` (`RiderController@availableOrders`): Returns an array of order objects with seller details for riders.
+3. `POST /chat/{order}/send` & `POST /seller/chat/{order}/send` (`MessageController@send`): Returns `{ success: true, message: {...} }` when `Accept: application/json` is sent.
+4. `POST /chat/{order}/read`, `POST /seller/chat/{order}/read`, `GET /chat/{order}/messages`, `GET /seller/chat/{order}/messages` (`MessageController`): Returns `{ success: true, messages: [...] }`.
+
+### 4.2. Currently Returning Blade Views / Web Redirects (Must be Converted)
+All remaining 100+ routes return Blade views or HTTP redirects (`redirect()->back()` or `redirect()->route(...)`) backed by session state.
+
+### 4.3. API Conversion Blueprint for Mobile App
+
+To support a mobile app (Flutter, React Native, iOS/Android), create an `api/v1` namespace with standardized JSON responses:
+
+```json
+{
+  "success": true,
+  "data": {},
+  "message": "Human readable confirmation",
+  "meta": {}
+}
+```
+
+#### Endpoints Required for Customer App (`/api/v1/customer/`)
+- `POST /auth/register` (Returns user object + bearer token or requires OTP)
+- `POST /auth/verify-otp` (Payload: `email`, `otp`; Returns Sanctum token + user profile)
+- `POST /auth/login` (Returns Sanctum token + user profile)
+- `POST /auth/logout` (Revokes current access token)
+- `GET /profile` & `PUT /profile` (Includes multipart avatar upload)
+- `GET /home` (Categories list, open sellers in user sector, top ratings)
+- `GET /sellers/{id}` (Seller profile, operating hours status, catalog products categorized)
+- `GET /sellers/{id}/products/{listing_id}` (Single product detail)
+- `GET /search?q={query}&sector={sector}` (Live shop/product search)
+- `POST /cart/validate` (Replaces session cart: client passes cart array; server validates stock, seller consistency, and computes subtotal/delivery)
+- `POST /checkout/apply-promo` (Validates promo code against cart subtotal)
+- `POST /orders` (Places order, reserves stock, dispatches notifications; returns created order object)
+- `GET /orders/active` (Orders currently in progress)
+- `GET /orders/history` (Completed and cancelled orders with pagination)
+- `GET /orders/{id}` (Full order details, items, seller info, assigned rider)
+- `POST /orders/{id}/cancel` (Allows cancellation if `pending` or `confirmed_by_seller`)
+- `POST /orders/{id}/feedback` (Submit rating 1-5 & comment)
+- `POST /favorites/sellers/{id}` & `POST /favorites/products/{id}` (Toggle favorites)
+- `GET /notifications` & `POST /notifications/read`
+
+#### Endpoints Required for Rider App (`/api/v1/rider/`)
+- `POST /auth/register` (Multipart: CNIC, License, Vehicle images, bio)
+- `POST /auth/login` (Rejects unapproved riders with `403 Forbidden`)
+- `POST /auth/logout`
+- `GET /dashboard` (Online state, active orders, today's metrics)
+- `POST /status/toggle` (Toggle online / offline)
+- `GET /orders/available` (Orders with status `ready_for_pickup` and `rider_id IS NULL`)
+- `POST /orders/{id}/accept` (Atomic lock & assign rider to order)
+- `POST /orders/{id}/pickup` (Update status to `picked_up`)
+- `POST /orders/{id}/deliver` (Multipart upload for delivery proof photo, update status to `delivered`)
+- `GET /history` (Delivered orders and earnings breakdown)
+
+#### Endpoints Required for Seller App (`/api/v1/seller/`)
+- `POST /auth/login` (Rejects unapproved accounts with `403`)
+- `GET /dashboard` (Live counters: pending, preparing, ready, completed)
+- `PUT /operating-hours` (Set opens_at, closes_at, is_open)
+- `GET /orders` (Filter by status: pending, in_progress, completed)
+- `POST /orders/{id}/confirm` (Triggers catalog stock decrement)
+- `POST /orders/{id}/ready` (Triggers `OrderReadyForPickup` event)
+- `POST /orders/{id}/reject` (Restores reserved inventory)
+- `GET /catalog` & `PUT /catalog/{listing_id}` (Update price, stock, active toggle)
+- `POST /catalog/bulk-update` (% price markup/markdown)
+- `GET /earnings` (Analytics summary and date filter)
+
+---
+
+## 5. Authentication Architecture & Sanctum Migration
+
+### Current State
+1. **Engine:** Traditional Laravel session cookies (`laravel_session`, `XSRF-TOKEN`).
+2. **Guards:** Three parallel session guards defined in `config/auth.php`:
+   - `web` -> `User` model
+   - `seller` -> `Seller` model
+   - `rider` -> `Rider` model
+3. **Session Dependency:** Customer OTP verification stores `otp_user_id` in session (`session(['otp_user_id' => $user->id])`), which fails in stateless REST APIs.
+4. **Cart Dependency:** Cart is stored entirely in PHP sessions (`Session::get('cart')`).
+
+### Migration to Token-Based Auth (Sanctum)
+
+`laravel/sanctum` is already installed (`^4.2`), and the `personal_access_tokens` table already exists in the database.
+
+#### Step 1: Enable API Routing in Laravel 11
+Edit `bootstrap/app.php` to register the `api.php` route file:
+```php
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php', // <-- Enable this line
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    // ...
+```
+
+#### Step 2: Model Setup
+`App\Models\User`, `App\Models\Seller`, and `App\Models\Rider` already import `Laravel\Sanctum\HasApiTokens`.
+
+#### Step 3: Sanctum Token Generation Pattern
+In login and registration controllers, issue scoped personal access tokens:
+
+```php
+// Customer Login (AuthController)
+if (Auth::attempt($credentials)) {
+    $user = Auth::user();
+    if (!$user->is_verified) {
+        return response()->json(['error' => 'Please verify your OTP first.'], 403);
+    }
+    $token = $user->createToken('customer-app', ['role:customer'])->plainTextToken;
+    return response()->json(['token' => $token, 'user' => $user]);
+}
+
+// Seller Login (SellerController)
+$seller = Seller::where('email', $request->email)->first();
+if ($seller && Hash::check($request->password, $seller->password)) {
+    if (!$seller->accountIsApproved) {
+        return response()->json(['error' => 'Account pending admin approval.'], 403);
+    }
+    $token = $seller->createToken('seller-app', ['role:seller'])->plainTextToken;
+    return response()->json(['token' => $token, 'seller' => $seller]);
+}
+
+// Rider Login (RiderAuthController)
+$rider = Rider::where('email', $request->email)->first();
+if ($rider && Hash::check($request->password, $rider->password)) {
+    if (!$rider->is_approved) {
+        return response()->json(['error' => 'Rider account not approved by admin.'], 403);
+    }
+    $token = $rider->createToken('rider-app', ['role:rider'])->plainTextToken;
+    return response()->json(['token' => $token, 'rider' => $rider]);
+}
+```
+
+#### Step 4: Stateless OTP Verification
+Refactor `verifyOtp` to accept `email` and `otp` directly in the request payload rather than reading `session('otp_user_id')`:
+```php
+public function verifyOtp(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email|exists:users,email',
+        'otp'   => 'required|digits:6',
+    ]);
+
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user || $user->otp !== $request->otp || Carbon::parse($user->otp_expires_at)->isPast()) {
+        return response()->json(['error' => 'Invalid or expired OTP.'], 422);
+    }
+
+    $user->update([
+        'is_verified' => true,
+        'otp' => null,
+        'otp_expires_at' => null,
+    ]);
+
+    $token = $user->createToken('customer-app', ['role:customer'])->plainTextToken;
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Account verified successfully.',
+        'token'   => $token,
+        'user'    => $user,
+    ]);
+}
+```
+
+#### Step 5: Multi-Guard Sanctum Resolution
+Because Sanctum's `personal_access_tokens` table is polymorphic (`tokenable_type` = `App\Models\User`, `App\Models\Seller`, or `App\Models\Rider`), incoming `Authorization: Bearer <token>` requests automatically hydrate the correct model on `$request->user()`. Middleware can enforce role permissions via abilities:
+```php
+Route::middleware(['auth:sanctum', 'ability:role:customer'])->group(function () {
+    Route::post('/checkout', [ApiOrderController::class, 'placeOrder']);
+});
+```
+
+---
+
+## 6. Full Database Schema & Entity Relationships
+
+The database contains **17 tables**. Below is the complete field-level reference, data types, constraints, and relationships.
+
+```
+                              +--------------------+
+                              | catalog_categories |
+                              +---------+----------+
+                                        | 1:N
+        +-------------------------------+-------------------------------+
+        | 1:N                                                           | 1:N
++-------v-------+                                               +-------v--------+
+|    sellers    |                                               | global_products|
++-------+-------+                                               +-------+--------+
+        |                                                               |
+        +-----------------------------+---------------------------------+
+                                      | N:M
+                              +-------v--------+
+                              |  shop_product  |
+                              +-------+--------+
+                                      | 1:N
++---------------+             +-------v--------+             +---------------+
+|     users     | 1:N         |   order_items  |         1:N |     riders    |
++-------+-------+             +-------+--------+             +-------+-------+
+        |                             |                              |
+        | 1:N                         | N:1                          | 1:N (nullable)
+        +---------------------->+-----v------+<----------------------+
+                                |   orders   |
+                                +-----+------+
+                                      | 1:N
+        +-----------------------------+------------------------------+
+        | 1:N                         | 1:1                          | 1:N
++-------v-------+             +-------v--------+             +-------v-------+
+|   messages    |             |    feedback    |             | notifications |
++---------------+             +----------------+             +---------------+
+```
+
+### Table 1: `users`
+Core customer and admin accounts.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `sellerType`: `TINYINT`, Default `2` (Comment: `1 for admin, 2 for buyer, 3 for seller`)
+- `name`: `VARCHAR(255)`, Not Null
+- `email`: `VARCHAR(255)`, Unique, Not Null
+- `email_verified_at`: `TIMESTAMP`, Nullable
+- `password`: `VARCHAR(255)`, Not Null
+- `mobile`: `VARCHAR(255)`, Nullable
+- `address`: `VARCHAR(255)`, Nullable (Primary delivery line)
+- `address2`: `VARCHAR(255)`, Nullable (Apartment / suite)
+- `city`: `VARCHAR(255)`, Nullable
+- `state`: `VARCHAR(255)`, Nullable
+- `zip`: `VARCHAR(255)`, Nullable
+- `pickup_time`: `ENUM('morning', 'afternoon', 'evening')`, Nullable
+- `is_verified`: `TINYINT(1)`, Default `0` (Email verified via OTP)
+- `otp`: `VARCHAR(255)`, Nullable (6-digit OTP string)
+- `otp_expires_at`: `TIMESTAMP`, Nullable
+- `remember_token`: `VARCHAR(100)`, Nullable
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+- **Relations:** HasMany `orders`, HasMany `favorites`, HasMany `feedback`, MorphMany `notifications`, HasOne `user_profile_updates`.
+
+### Table 2: `sellers`
+Neighborhood grocery merchants.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `catalog_category_id`: `BIGINT UNSIGNED`, Nullable, Foreign Key -> `catalog_categories.id` (`ON DELETE SET NULL`)
+- `name`: `VARCHAR(255)`, Not Null (Owner / shop contact name)
+- `email`: `VARCHAR(255)`, Unique, Not Null
+- `password`: `VARCHAR(255)`, Not Null
+- `profile_image`: `VARCHAR(255)`, Nullable (Path in `public` disk)
+- `city`: `VARCHAR(255)`, Nullable (Default: `Karachi`)
+- `area`: `VARCHAR(255)`, Nullable (Default: `Baldia Town`)
+- `sector`: `VARCHAR(10)`, Nullable (Allowed: `4A`, `4B`, `4C`)
+- `near_areas`: `JSON`, Nullable (Array of landmark tags, e.g. `["Ali Chowk", "Lahori Hotel"]`)
+- `full_address`: `TEXT`, Nullable
+- `opens_at`: `TIME`, Nullable (e.g. `08:00:00`)
+- `closes_at`: `TIME`, Nullable (e.g. `23:00:00`)
+- `is_open`: `TINYINT(1)`, Default `1` (Manual store open/closed toggle)
+- `accountIsApproved`: `INT UNSIGNED`, Default `0` (`1` = active, `0` = pending admin approval)
+- `is_deleted`: `TINYINT(1)`, Default `0` (Soft removal by admin)
+- `remember_token`: `VARCHAR(100)`, Nullable
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+- **Relations:** BelongsTo `catalog_categories`, BelongsToMany `global_products` (via `shop_product`), HasMany `products` (legacy), HasMany `orders`, HasMany `feedback`, HasOne `seller_verifications`.
+
+### Table 3: `riders`
+Hyper-local delivery partners.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `name`: `VARCHAR(255)`, Not Null
+- `email`: `VARCHAR(255)`, Unique, Not Null
+- `phone`: `VARCHAR(255)`, Nullable (11-digit mobile)
+- `password`: `VARCHAR(255)`, Not Null
+- `cnic_number`: `VARCHAR(255)`, Unique, Not Null (13-digit national ID)
+- `address`: `TEXT`, Not Null
+- `vehicle_type`: `VARCHAR(255)`, Nullable (e.g. `bike`, `motorcycle`)
+- `vehicle_number`: `VARCHAR(255)`, Not Null (Registration plate)
+- `profile_image`: `VARCHAR(255)`, Nullable
+- `cnic_front`: `VARCHAR(255)`, Nullable
+- `cnic_back`: `VARCHAR(255)`, Nullable
+- `license_image`: `VARCHAR(255)`, Nullable
+- `vehicle_image`: `VARCHAR(255)`, Nullable
+- `registration_book`: `VARCHAR(255)`, Nullable
+- `current_lat`: `DECIMAL(10, 7)`, Nullable
+- `current_long`: `DECIMAL(10, 7)`, Nullable
+- `status`: `ENUM('online', 'offline', 'busy')`, Default `'offline'`
+- `is_approved`: `TINYINT(1)`, Default `0` (Admin KYC approval)
+- `is_verified`: `TINYINT(1)`, Default `0`
+- `remember_token`: `VARCHAR(100)`, Nullable
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+- **Relations:** HasMany `orders`.
+
+### Table 4: `catalog_categories`
+Master taxonomy for grocery businesses.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `name`: `VARCHAR(255)`, Unique, Not Null (e.g., `General Store`, `Dairy & Bakery`)
+- `slug`: `VARCHAR(255)`, Unique, Not Null
+- `description`: `TEXT`, Nullable
+- `is_active`: `TINYINT(1)`, Default `1`
+- `created_by_admin_id`: `BIGINT UNSIGNED`, Nullable, Foreign Key -> `users.id`
+- `updated_by_admin_id`: `BIGINT UNSIGNED`, Nullable, Foreign Key -> `users.id`
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+- **Relations:** HasMany `sellers`, HasMany `global_products`.
+
+### Table 5: `global_products`
+Standardized master SKU library maintained by Admin.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `catalog_category_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `catalog_categories.id` (`ON DELETE CASCADE`)
+- `name`: `VARCHAR(255)`, Not Null (e.g., `Olpers Milk 1L`, `Dawn Bread Large`)
+- `description`: `TEXT`, Nullable
+- `base_price`: `DECIMAL(10, 2)`, Not Null
+- `unit_type`: `VARCHAR(255)`, Nullable (e.g., `Carton`, `Loaf`, `Packet`, `Kg`, `Dozen`)
+- `default_image`: `VARCHAR(255)`, Nullable
+- `is_active`: `TINYINT(1)`, Default `1`
+- `created_by_admin_id`: `BIGINT UNSIGNED`, Nullable, Foreign Key -> `users.id`
+- `updated_by_admin_id`: `BIGINT UNSIGNED`, Nullable, Foreign Key -> `users.id`
+- `deleted_at`: `TIMESTAMP`, Nullable (SoftDeletes)
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+- **Relations:** BelongsTo `catalog_categories`, BelongsToMany `sellers` (via `shop_product`), HasMany `shop_products`.
+
+### Table 6: `shop_product` (Pivot)
+Merchant inventory links with localized pricing and stock.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `seller_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `sellers.id` (`ON DELETE CASCADE`)
+- `global_product_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `global_products.id` (`ON DELETE CASCADE`)
+- `custom_price`: `DECIMAL(10, 2)`, Nullable (If null, falls back to `global_products.base_price`)
+- `stock_quantity`: `INT UNSIGNED`, Default `0`, Not Null
+- `is_active`: `TINYINT(1)`, Default `1`, Not Null
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+- **Unique Constraint:** `(seller_id, global_product_id)`
+- **Relations:** BelongsTo `seller`, BelongsTo `global_product`, HasMany `order_items`.
+
+### Table 7: `products` (Legacy SKUs)
+Custom standalone products created directly by sellers before the master catalog existed.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `seller_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `sellers.id` (`ON DELETE CASCADE`)
+- `name`: `VARCHAR(255)`, Not Null
+- `description`: `TEXT`, Not Null
+- `price`: `DECIMAL(10, 2)`, Not Null
+- `stock_quantity`: `INT`, Default `0`, Not Null
+- `unit_type`: `VARCHAR(255)`, Nullable
+- `category_id`: `BIGINT UNSIGNED`, Nullable
+- `seller_city`: `VARCHAR(255)`, Not Null
+- `seller_area`: `VARCHAR(255)`, Not Null
+- `seller_contact_no`: `VARCHAR(255)`, Not Null
+- `image`: `VARCHAR(255)`, Nullable
+- `is_approved`: `TINYINT(1)`, Default `0` (Admin approval flag)
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+
+### Table 8: `orders`
+Master order transaction record.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `user_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `users.id` (`ON DELETE CASCADE`)
+- `seller_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `sellers.id` (`ON DELETE CASCADE`)
+- `rider_id`: `BIGINT UNSIGNED`, Nullable, Foreign Key -> `riders.id` (`ON DELETE SET NULL`)
+- `address`: `VARCHAR(255)`, Not Null
+- `phone`: `VARCHAR(255)`, Not Null
+- `status`: `ENUM(
+    'pending',
+    'confirmed_by_seller',
+    'preparing',
+    'ready_for_pickup',
+    'assigned_to_rider',
+    'picked_up',
+    'delivered',
+    'cancelled',
+    'rejected',
+    'completed'
+  )`, Default `'pending'`
+- `total_amount`: `DECIMAL(10, 2)`, Not Null (Payable after discounts)
+- `delivery_charges`: `DECIMAL(8, 2)`, Default `0.00`, Not Null
+- `transaction_id`: `VARCHAR(255)`, Nullable (Online payment gateway transaction reference)
+- `promo_code_id`: `BIGINT UNSIGNED`, Nullable
+- `discount_amount`: `DECIMAL(10, 2)`, Default `0.00`, Not Null
+- `inventory_reserved_at`: `TIMESTAMP`, Nullable (Set when seller confirms order)
+- `estimated_delivery_at`: `TIMESTAMP`, Nullable (Default: `now() + 45 minutes`)
+- `delivery_proof_image`: `VARCHAR(255)`, Nullable (Uploaded by rider on delivery)
+- `cancelled_at`: `TIMESTAMP`, Nullable
+- `cancellation_reason`: `VARCHAR(255)`, Nullable
+- `delivery_instructions`: `TEXT`, Nullable (Added in migration `2026_07_21_100000`)
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+- **Relations:** BelongsTo `user`, BelongsTo `seller`, BelongsTo `rider`, HasMany `items` (`OrderItem`), HasMany `messages`, HasOne `feedback`.
+
+### Table 9: `order_items`
+Individual line items in an order.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `order_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `orders.id` (`ON DELETE CASCADE`)
+- `shop_product_id`: `BIGINT UNSIGNED`, Nullable, Foreign Key -> `shop_product.id` (`ON DELETE SET NULL`)
+- `global_product_id`: `BIGINT UNSIGNED`, Nullable, Foreign Key -> `global_products.id` (`ON DELETE SET NULL`)
+- `product_id`: `BIGINT UNSIGNED`, Nullable, Foreign Key -> `products.id` (`ON DELETE CASCADE`) (Legacy fallback)
+- `item_name`: `VARCHAR(255)`, Nullable (Snapshot of SKU name at purchase)
+- `unit_type`: `VARCHAR(255)`, Nullable
+- `item_image`: `VARCHAR(255)`, Nullable
+- `quantity`: `INT`, Not Null
+- `price`: `DECIMAL(10, 2)`, Not Null (Unit price at time of purchase)
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+- **Relations:** BelongsTo `order`, BelongsTo `shopProduct`, BelongsTo `globalProduct`, BelongsTo `product`.
+
+### Table 10: `promo_codes`
+Discount vouchers.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `code`: `VARCHAR(255)`, Unique, Not Null (Stored uppercase, e.g. `WELCOME50`)
+- `discount_type`: `VARCHAR(255)`, Default `'fixed'` (`'fixed'` or `'percent'`)
+- `discount_value`: `DECIMAL(10, 2)`, Not Null
+- `minimum_order_amount`: `DECIMAL(10, 2)`, Default `0.00`, Not Null
+- `maximum_discount_amount`: `DECIMAL(10, 2)`, Nullable (Applies to percent caps)
+- `usage_limit`: `INT UNSIGNED`, Nullable (Max lifetime redemptions)
+- `used_count`: `INT UNSIGNED`, Default `0`, Not Null
+- `is_active`: `TINYINT(1)`, Default `1`, Not Null
+- `starts_at`: `TIMESTAMP`, Nullable
+- `expires_at`: `TIMESTAMP`, Nullable
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+
+### Table 11: `messages`
+Order-specific direct chat between Customer and Merchant.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `order_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `orders.id` (`ON DELETE CASCADE`)
+- `sender_id`: `BIGINT UNSIGNED`, Not Null
+- `sender_type`: `VARCHAR(255)`, Not Null (`'user'` or `'seller'`)
+- `message`: `TEXT`, Not Null
+- `is_read`: `TINYINT(1)`, Default `0`, Not Null
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+- **Relations:** BelongsTo `order`.
+
+### Table 12: `feedback`
+Post-delivery ratings and reviews.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `order_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `orders.id` (`ON DELETE CASCADE`)
+- `user_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `users.id` (`ON DELETE CASCADE`)
+- `seller_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `sellers.id` (`ON DELETE CASCADE`)
+- `feedback`: `TEXT`, Not Null
+- `rating`: `TINYINT UNSIGNED`, Default `5`, Not Null (Min 1, Max 5)
+- `status`: `VARCHAR(255)`, Default `'pending'`, Not Null (`pending`, `approved`, `rejected`)
+- `moderated_at`: `TIMESTAMP`, Nullable
+- `moderated_by`: `BIGINT UNSIGNED`, Nullable, Foreign Key -> `users.id` (`ON DELETE SET NULL`)
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+- **Relations:** BelongsTo `order`, BelongsTo `user`, BelongsTo `seller`.
+
+### Table 13: `favorites`
+Customer bookmarks for shops and products.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `user_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `users.id` (`ON DELETE CASCADE`)
+- `seller_id`: `BIGINT UNSIGNED`, Nullable, Foreign Key -> `sellers.id` (`ON DELETE CASCADE`)
+- `shop_product_id`: `BIGINT UNSIGNED`, Nullable, Foreign Key -> `shop_product.id` (`ON DELETE CASCADE`)
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+- **Unique Keys:** `(user_id, seller_id)`, `(user_id, shop_product_id)`
+
+### Table 14: `seller_verifications`
+Merchant KYC document verification requests.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `seller_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `sellers.id` (`ON DELETE CASCADE`)
+- `status`: `ENUM('pending', 'approved', 'rejected')`, Default `'pending'`
+- `documents`: `JSON`, Nullable (Array of document filepaths on storage)
+- `business_description`: `TEXT`, Nullable
+- `reason_for_verification`: `TEXT`, Nullable
+- `rejection_reason`: `TEXT`, Nullable
+- `reviewed_by`: `BIGINT UNSIGNED`, Nullable, Foreign Key -> `users.id` (`ON DELETE SET NULL`)
+- `submitted_at`, `reviewed_at`: `TIMESTAMP`, Nullable
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+- **Relations:** BelongsTo `seller`, BelongsTo `reviewer` (`User`).
+
+### Table 15: `user_profile_updates`
+Avatar storage extension for customer accounts.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `user_id`: `BIGINT UNSIGNED`, Not Null, Foreign Key -> `users.id` (`ON DELETE CASCADE`)
+- `profile_image`: `VARCHAR(255)`, Nullable
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+
+### Table 16: `notifications`
+Standard Laravel database notifications.
+- `id`: `CHAR(36)`, Primary Key (UUID)
+- `type`: `VARCHAR(255)`, Not Null (Notification class name)
+- `notifiable_type`: `VARCHAR(255)`, Not Null (e.g. `App\Models\User`, `App\Models\Seller`)
+- `notifiable_id`: `BIGINT UNSIGNED`, Not Null
+- `data`: `TEXT`, Not Null (Serialized JSON payload)
+- `read_at`: `TIMESTAMP`, Nullable
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+
+### Table 17: `personal_access_tokens`
+Sanctum API Bearer tokens.
+- `id`: `BIGINT UNSIGNED`, Primary Key, Auto Increment
+- `tokenable_type`: `VARCHAR(255)`, Not Null
+- `tokenable_id`: `BIGINT UNSIGNED`, Not Null
+- `name`: `TEXT`, Not Null
+- `token`: `VARCHAR(64)`, Unique, Not Null
+- `abilities`: `TEXT`, Nullable
+- `last_used_at`: `TIMESTAMP`, Nullable
+- `expires_at`: `TIMESTAMP`, Nullable
+- `created_at`, `updated_at`: `TIMESTAMP`, Nullable
+
+---
+
+## 7. Core Business Logic & Workflows
+
+### 7.1. Order Lifecycle & Status State Machine
+
+```
+              Customer creates order
+                       |
+                       v
+                 [ pending ] <------------------ Customer can cancel
+                       |
+          +------------+------------+
+          |                         |
+          v Seller accepts          v Seller rejects
+[ confirmed_by_seller ]       [ rejected ]
+   (reserves stock)           (restores stock)
+          |
+          v Seller prepares
+    [ preparing ]
+          |
+          v Seller packs
+  [ ready_for_pickup ] -------> Broadcasts: OrderReadyForPickup (Pusher)
+          |
+          v Rider accepts
+ [ assigned_to_rider ]
+          |
+          v Rider picks up
+    [ picked_up ]
+          |
+          v Rider delivers (uploads proof)
+    [ delivered ]
+          |
+          v
+   [ completed ]
+```
+
+1. **Placement:** Buyer checks out; order is created with `status = 'pending'`. Estimated delivery is initialized to `now() + 45 minutes`.
+2. **Cancellation Window:** The customer is permitted to cancel the order **only** while in `pending` or `confirmed_by_seller` states.
+3. **Seller Acceptance & Stock Reservation:**
+   - When the seller changes status to `confirmed_by_seller`, `inventory_reserved_at` is stamped.
+   - For every item referencing a `shop_product_id`, the system runs an atomic check:
+     ```php
+     ShopProduct::whereKey($id)
+         ->where('stock_quantity', '>=', $qty)
+         ->decrement('stock_quantity', $qty);
+     ```
+   - If stock is insufficient, the transaction throws an exception and halts confirmation.
+4. **Seller Rejection:** If the seller rejects an order that had previously reserved inventory, the stock is automatically restored via `increment('stock_quantity', $qty)`.
+5. **Rider Fulfillment:**
+   - Once packed, the seller sets `status = 'ready_for_pickup'`. The system broadcasts `App\Events\OrderReadyForPickup` over the private Pusher channel `riders`.
+   - Available riders query `/rider/available-orders`.
+   - The first rider to click accept claims the order via an atomic condition:
+     ```php
+     Order::where('id', $orderId)
+         ->where('status', 'ready_for_pickup')
+         ->whereNull('rider_id')
+         ->update(['rider_id' => $rider->id, 'status' => 'assigned_to_rider']);
+     ```
+   - Rider marks `picked_up`, then `delivered`. When marking `delivered`, the rider optionally uploads a delivery proof photo.
+
+### 7.2. Cart & Pricing Rules
+- **Single-Seller Cart Rule:** A buyer can only have items from **one seller** in their cart at any time. Adding an item from another shop requires clearing the cart.
+- **Master vs Custom Pricing:**
+  - `GlobalProduct` defines a default `base_price`.
+  - `ShopProduct` defines an optional `custom_price`.
+  - `effective_price` = `$listing->custom_price ?? $listing->globalProduct->base_price`.
+- **Promo Code Calculation:**
+  - Evaluated against `subtotal = sum(price * quantity)`.
+  - Type `percent`: `discount = (subtotal * discount_value) / 100`.
+  - Type `fixed`: `discount = discount_value`.
+  - If `maximum_discount_amount` is set, `discount = min(discount, maximum_discount_amount)`.
+  - Total cannot drop below 0: `payable = max(0, subtotal + deliveryFee - discount)`.
+- **Delivery Charges:**
+  - In `OrderController`, the delivery charge is currently hardcoded:
+    ```php
+    $deliveryFee = $subtotal > 0 ? 0 : 0; // Hardcoded to 0
+    'delivery_charges' => 0.00
+    ```
+  - The database column `delivery_charges` supports dynamic fees, and the rider's earnings calculation sums `delivery_charges`.
+
+### 7.3. Store Operating Hours & Open Toggle
+- Each merchant has `opens_at` (`TIME`), `closes_at` (`TIME`), and `is_open` (`BOOLEAN`).
+- `Seller::isAcceptingOrders()` checks:
+  1. If `is_open == false`, store is closed.
+  2. If hours are null, store defaults to open.
+  3. If `opens_at <= closes_at` (standard daytime): Open if `now() between opens_at and closes_at`.
+  4. If `opens_at > closes_at` (overnight shifts): Open if `now() >= opens_at OR now() <= closes_at`.
+- If a shop is not accepting orders, product views redirect with a modal alert, and cart adds/checkout attempts are blocked.
+
+### 7.4. Payment Methods
+1. **Cash on Delivery (COD):** The default operational mode. `transaction_id` is null.
+2. **Online Payment:** Controlled by the configuration `services.payments.online_enabled` (`ONLINE_PAYMENTS_ENABLED` in `.env`, defaults to `false`). When enabled, checkout requires `transaction_id`. Currently no payment gateway SDK (Stripe, JazzCash, EasyPaisa) is integrated.
+
+### 7.5. Notifications & Mails
+
+| Event / Trigger | Class | Channel | Recipients | Payload |
+| :--- | :--- | :--- | :--- | :--- |
+| **User Registration** | `App\Mail\OtpMail` | Mail | Customer | 6-digit OTP code |
+| **New Order Placed** | `App\Notifications\NewOrderNotification` | Database + Mail | Seller | Order ID, buyer name, item list JSON |
+| **Order Confirmation**| `App\Mail\OrderPlacedMail` | Mail | Customer | Order invoice summary |
+| **Status Change** | `App\Notifications\OrderStatusNotification` | Database | Customer | Status label, color, icon, rider name |
+| **Order Delivered** | `App\Mail\OrderDeliveredMail` | Mail | Customer | Completion receipt |
+| **Order Cancelled** | `App\Mail\OrderCancelledMail` | Mail | Customer | Cancellation reason |
+| **New Product Added**| `App\Notifications\NewServiceAddedNotification` | Database + Mail | 5 latest users *(hardcoded)* | Store name, product name |
+| **Product Approved** | `App\Notifications\ServiceApprovedNotification` | Database + Mail | Seller | Product name, panel link |
+| **Order Ready** | `App\Events\OrderReadyForPickup` | Pusher Broadcast (`riders`) | Online Riders | Order ID, seller address |
+| **Order Chat** | `App\Events\NewMessage` | Pusher Broadcast (`chat.{orderId}`) | Buyer / Seller | Message body, sender ID *(broadcasting currently commented out)* |
+
+---
+
+## 8. Third-Party Services & Integrations
+
+> *Confidentiality Notice: Only service names and configuration keys are listed. No secrets or credentials.*
+
+1. **Pusher Channels (Real-Time WebSockets):**
+   - Keys in `.env`: `PUSHER_APP_ID`, `PUSHER_APP_KEY`, `PUSHER_APP_SECRET`, `PUSHER_APP_CLUSTER`, `PUSHER_HOST`, `PUSHER_PORT`, `PUSHER_SCHEME`.
+   - Used for private channel broadcasting to riders (`riders`) and order chat (`chat.{orderId}`).
+2. **Transactional Email Services:**
+   - Supported mailers in `.env`: `smtp`, `ses` (AWS), `postmark`, `resend`.
+   - Configuration in `config/services.php`:
+     - AWS SES: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`.
+     - Postmark: `POSTMARK_TOKEN`.
+     - Resend: `RESEND_KEY`.
+3. **AWS S3 (Cloud Object Storage):**
+   - Configured in `config/filesystems.php` under the `s3` disk:
+     - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, `AWS_BUCKET`, `AWS_URL`, `AWS_ENDPOINT`.
+4. **Slack Notifications:**
+   - Configured in `config/services.php`: `SLACK_BOT_USER_OAUTH_TOKEN`, `SLACK_BOT_USER_DEFAULT_CHANNEL`.
+
+---
+
+## 9. File & Media Upload Handling
+
+All uploads are currently stored on the **`public` disk** (`storage_path('app/public')`), which maps to `public/storage/` via the `php artisan storage:link` symlink.
+
+```
+storage/app/public/
+├── profile_images/          # Customer & Seller avatars (GD-sanitized)
+├── products/                # Legacy seller product images
+├── global-products/         # Master catalog default SKU images
+├── delivery_proofs/         # Rider post-delivery camera snapshots
+├── verification_documents/  # Merchant KYC PDF / image uploads
+│   └── {seller_id}/
+└── rider_docs/              # Rider onboarding documentation
+    ├── profile/
+    ├── cnic/
+    ├── license/
+    └── vehicle/
+```
+
+### Sanitization & Processing Logic (`App\Support\SanitizedImageUpload`)
+To prevent malicious payload injection (such as PHP code hidden inside EXIF metadata):
+1. Reads raw bytes via `file_get_contents`.
+2. Validates image MIME types using `getimagesizefromstring` (restricts to JPEG, PNG, GIF).
+3. Strips metadata by recreating the image on a new true-color canvas via PHP GD:
+   ```php
+   $image = imagecreatefromstring($contents);
+   $canvas = imagecreatetruecolor($width, $height);
+   imagecopy($canvas, $image, 0, 0, 0, 0, $width, $height);
+   imagejpeg($canvas, null, 85);
+   ```
+4. Saves as a random UUID filename: `profile_images/{UUID}.jpg`.
+
+*Note for Mobile Apps:* The mobile app should upload files using standard `multipart/form-data`. Max allowed sizes:
+- Profile & Product images: `max:2048` (2 MB)
+- Delivery proof: `max:4096` (4 MB)
+- Seller verification documents: `max:5120` (5 MB, supports PDF)
+
+---
+
+## 10. Known Bugs, Security Gaps & Hardcoded Logic
+
+During the analysis of the backend source code, the following architectural bugs, security loopholes, and hardcoded values were identified. **These must be addressed when building the API layer:**
+
+### 10.1. Critical Security Gaps
+1. **Unverified User Login Allowed (`AuthController.php`):**
+   - When a user registers, `is_verified` is set to `false`, and an OTP is emailed.
+   - However, `AuthController::login()` validates only credentials (`Auth::attempt($credentials)`) and **does not check `is_verified`**. An unverified user can bypass OTP verification simply by submitting the login form directly.
+   - *Fix for API:* Add `if (!$user->is_verified) { return response()->json(['error' => 'Unverified'], 403); }`.
+2. **Missing Auth Middleware on Order Review (`web.php` line 205):**
+   - Route `POST /order/{id}/feedback` (`OrderController@submitFeedback`) is **not** protected by `auth` middleware in `web.php`.
+   - The controller executes `auth()->id()`. If a guest hits this endpoint, `auth()->id()` returns null, causing an unhandled database `QueryException` or creating an orphaned review.
+3. **Session Fixation in API Context:**
+   - Controllers call `$request->session()->regenerate()`. Stateless API requests without cookies will crash if session drivers are not properly decoupled.
+
+### 10.2. Business Logic Bugs
+4. **Inventory Leak on Customer Order Cancellation (`OrderController.php`):**
+   - When a seller confirms an order, `reserveCatalogInventory()` decrements stock, and `inventory_reserved_at` is set.
+   - If the seller later rejects the order, `restoreCatalogInventory()` increments the stock back.
+   - **Bug:** If the *customer* cancels the order (`cancel()` method, line 573) while status is `confirmed_by_seller`, the order status is updated to `cancelled`, but **`restoreCatalogInventory()` is never called**. The reserved stock is permanently lost from the shop's inventory.
+5. **Missing `rider_id` in Order Mass Assignment (`Order.php`):**
+   - The `$fillable` array in `App\Models\Order` does not contain `'rider_id'`.
+   - Direct `$order->update(['rider_id' => $riderId])` or `$order->fill(...)` will silently drop `rider_id`. (In `RiderController`, this works only because it was called on the raw query builder: `Order::where(...)->update(...)`).
+   - The `Order` model also lacks a `public function rider()` relationship.
+6. **Rider Omitted from Chat Authorization (`MessageController.php`):**
+   - `Broadcast::channel('chat.{orderId}')` in `routes/channels.php` explicitly allows riders to listen to order chat.
+   - However, `MessageController::send()` and `MessageController::getMessages()` only check `isSeller` or `auth()->id() == $order->user_id`. A rider cannot send or read messages through the controller.
+7. **Chat Realtime Broadcasting is Commented Out (`MessageController.php` line 75):**
+   - Line 75 contains `// event(new NewMessage($message, $order));` with a comment stating real-time broadcasting was disabled in favor of polling. The chat currently requires polling every few seconds (`/chat/{order}/messages?since=X`).
+
+### 10.3. Hardcoded Values & Geographical Constraints
+8. **Hardcoded Karachi / Baldia Town Landmarks (`HomeController.php` lines 59-68):**
+   ```php
+   $sectorOptions = ['4A', '4B', '4C'];
+   $nearAreaOptions = [
+       'ABC Swimming Pool',
+       'Tajli Noor Masjid',
+       'Lahori Hotel',
+       'Ali Chowk',
+       'Family Park',
+       'Carido Hospital',
+       'Rubi Mor',
+   ];
+   ```
+   These are hardcoded in the controller instead of being loaded from a `sectors` or `landmarks` database table.
+9. **Hardcoded Zero Delivery Fee (`OrderController.php` lines 143, 312, 471):**
+   ```php
+   $deliveryFee = $subtotal > 0 ? 0 : 0;
+   'delivery_charges' => 0.00,
+   ```
+   Delivery charges are forced to zero regardless of customer distance or order size.
+10. **Arbitrary 5 Users Notified on Product Creation (`SellerProductController.php` line 37):**
+    ```php
+    $users = AppUser::latest()->take(5)->get();
+    foreach ($users as $user) {
+        $user->notify(new NewServiceAddedNotification(...));
+    }
+    ```
+    When a seller adds a product, notifications are dispatched to exactly the 5 most recently created users in the entire database, regardless of location or preference.
+11. **Dormant `Admin` Model:**
+    - `App\Models\Admin` exists in the codebase and `config/auth.php` defines an `admins` provider.
+    - However, the application uses `User` with `sellerType = 1` for administrators. The `Admin` model is completely unused.
+
+---
+
+## 11. Mobile App MVP Feature Scope & Recommended Build Order
+
+### 11.1. Minimum Viable Product (MVP) Scope
+
+For the initial launch of the Bakala Express mobile application, focus on the **Customer App** and a streamlined **Rider App**. Store management can remain on the web panel initially.
+
+```
++---------------------------------------------------------------+
+|                       Bakala Express MVP                      |
++-------------------------------+-------------------------------+
+|          Customer App         |           Rider App           |
++-------------------------------+-------------------------------+
+| - Phone/Email OTP Auth        | - Phone Login (Approved only) |
+| - Sector/Landmark Location    | - Online/Offline Toggle       |
+| - Merchant Storefronts        | - Available Orders Radar      |
+| - Single-Seller Smart Cart    | - 1-Click Order Claiming      |
+| - COD Checkout                | - Turn-by-Turn Addresses      |
+| - Visual Order Tracker        | - Proof-of-Delivery Photo     |
+| - In-App Order Chat           | - Daily Earnings Counter      |
++-------------------------------+-------------------------------+
+```
+
+### 11.2. Recommended Step-by-Step Build Order
+
+```
+[Phase 1: Backend API Foundation]
+       |
+       v
+[Phase 2: Authentication & Onboarding]
+       |
+       v
+[Phase 3: Storefront, Discovery & Search]
+       |
+       v
+[Phase 4: Cart & Promo System]
+       |
+       v
+[Phase 5: Checkout & Order Creation]
+       |
+       v
+[Phase 6: Order Lifecycle, Tracking & Chat]
+       |
+       v
+[Phase 7: Rider Fulfillment App]
+       |
+       v
+[Phase 8: Push Notifications & Launch Polish]
+```
+
+#### Phase 1: Backend API Foundation (Laravel)
+1. **Enable API routing:** Register `routes/api.php` in `bootstrap/app.php`.
+2. **Fix identified bugs:**
+   - Add `rider_id` to `$fillable` and define `rider()` relation in `App\Models\Order`.
+   - Fix stock restoration in `OrderController::cancel()`.
+   - Enforce `is_verified` check in authentication.
+3. **Build standardized API Response trait / Resource classes:**
+   - `UserResource`, `SellerResource`, `ProductResource`, `OrderResource`.
+4. **Configure Sanctum:** Implement token generation for both `User` and `Rider` models.
+
+#### Phase 2: Authentication & Location Onboarding (Mobile)
+1. Splash screen & introductory walkthrough.
+2. Sign Up screen with Email & Phone number.
+3. 6-digit OTP verification screen (with automatic timer countdown & resend capability).
+4. Sector & Landmark selection modal (defaults: Baldia Town Sector 4A/4B/4C).
+5. Secure token storage (EncryptedSharedPreferences on Android / Keychain on iOS).
+
+#### Phase 3: Storefront & Product Discovery
+1. Home screen displaying:
+   - Location banner with sector switcher.
+   - Category carousels (General Store, Dairy & Bakery, Fruits & Vegetables).
+   - Active, open shops in the user's sector.
+2. Store detail screen:
+   - Shop banner, opening hours badge, review rating.
+   - Categorized product grid with custom seller pricing and stock badges.
+3. Search screen:
+   - Debounced search calling `/api/v1/search` with instant availability badges.
+
+#### Phase 4: Cart Management
+1. Local cart state management (Riverpod / Bloc / Redux) mirroring backend rules.
+2. Enforce the **single-seller constraint** with an alert dialog:
+   *"Your cart contains items from Shop A. Clear cart to add items from Shop B?"*
+3. Stock limiters (cannot increment beyond `stock_quantity`).
+
+#### Phase 5: Checkout & Order Placement
+1. Checkout summary screen:
+   - Saved address & contact phone auto-fill.
+   - Delivery instructions note box.
+   - Promo code input box with live discount recalculation.
+   - Payment method toggle: Cash on Delivery (default).
+2. Atomic order submission endpoint call.
+3. Clear local cart upon confirmation; transition to live order screen.
+
+#### Phase 6: Order Tracking, Chat & Reviews
+1. Visual status tracker:
+   `Pending` -> `Confirmed` -> `Preparing` -> `Ready for Pickup` -> `Out for Delivery` -> `Delivered`.
+2. Real-time chat screen between customer and merchant (polling with `?since=` or Pusher WebSocket).
+3. Order cancellation button (active only when status is `pending` or `confirmed_by_seller`).
+4. Post-delivery modal: 1 to 5 star rating and feedback comment.
+5. "Buy Again" button in order history to re-populate cart with available items.
+
+#### Phase 7: Rider Fulfillment Application
+1. Rider login with pending verification status check.
+2. Shift toggle switch (Online / Offline).
+3. "Available Orders" feed updating when orders reach `ready_for_pickup`.
+4. Order claim action (with race-condition handling if another rider claims first).
+5. Active order details: Store address, customer phone dialer, delivery address.
+6. Status updates: `Picked Up` and `Delivered` (with camera upload for proof of delivery).
+
+#### Phase 8: Push Notifications & Launch Polish
+1. Integrate Firebase Cloud Messaging (FCM) to replace web database notifications for mobile devices.
+2. Store device FCM tokens on `users` and `riders` tables.
+3. Trigger push notifications for:
+   - Order confirmed by merchant.
+   - Rider assigned & order out for delivery.
+   - Delivery completed.
+   - New chat messages.

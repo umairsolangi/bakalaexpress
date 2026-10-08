@@ -1,0 +1,335 @@
+/* Order Tracking Styles */
+:root {
+  --primary: #1abc9c;
+  --primary-dark: #16a085;
+  --secondary: #3498db;
+  --secondary-dark: #2980b9;
+  --text-dark: #2c3e50;
+  --text-muted: #7f8c8d;
+  --text-light: #ecf0f1;
+  --danger: #e74c3c;
+  --warning: #f39c12;
+  --success: #2ecc71;
+  --border-light: #e0e0e0;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.track-section {
+  padding: 2rem 0;
+}
+
+.track-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  padding: 2rem;
+  position: relative;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.track-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.track-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* Order status badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-delivered {
+  background-color: rgba(46, 204, 113, 0.15);
+  color: var(--success);
+}
+
+.status-processing {
+  background-color: rgba(52, 152, 219, 0.15);
+  color: var(--secondary);
+}
+
+.status-cancelled {
+  background-color: rgba(231, 76, 60, 0.15);
+  color: var(--danger);
+}
+
+.status-washing {
+  background-color: rgba(243, 156, 18, 0.15);
+  color: var(--warning);
+}
+
+.status-ready {
+  background-color: rgba(142, 68, 173, 0.15);
+  color: #8e44ad;
+}
+
+/* Status timeline */
+.timeline-container {
+  position: relative;
+  margin: 2rem 0;
+}
+
+.timeline-track {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: var(--border-light);
+  z-index: 1;
+}
+
+.timeline-progress {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  height: 4px;
+  background-color: var(--primary);
+  z-index: 2;
+  transition: width 0.5s ease;
+}
+
+.timeline-points {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  z-index: 3;
+}
+
+.timeline-point {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.point-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  background-color: #fff;
+  border: 2px solid var(--border-light);
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.point-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.timeline-point.active .point-icon,
+.timeline-point.completed .point-icon {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: 0 0 0 4px rgba(26, 188, 156, 0.2);
+}
+
+.timeline-point.active .point-label,
+.timeline-point.completed .point-label {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.timeline-point.cancelled .point-icon {
+  background-color: var(--danger);
+  border-color: var(--danger);
+  color: white;
+  box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.2);
+}
+
+.timeline-point.cancelled .point-label {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+/* Order details */
+.order-details {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  align-items: center;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.detail-value {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* Order items */
+.order-items {
+  margin-top: 1.5rem;
+}
+
+.item-card {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  margin-bottom: 0.75rem;
+}
+
+.item-name {
+  flex-grow: 1;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+.item-qty {
+  margin: 0 1rem;
+  padding: 0.25rem 0.5rem;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.item-price {
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+/* Alerts */
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.alert i {
+  font-size: 1.25rem;
+  margin-right: 0.75rem;
+}
+
+.alert-success {
+  background-color: rgba(46, 204, 113, 0.15);
+  color: var(--success);
+  border-left: 4px solid var(--success);
+}
+
+.alert-info {
+  background-color: rgba(52, 152, 219, 0.15);
+  color: var(--secondary);
+  border-left: 4px solid var(--secondary);
+}
+
+.alert-warning {
+  background-color: rgba(243, 156, 18, 0.15);
+  color: var(--warning);
+  border-left: 4px solid var(--warning);
+}
+
+.alert-danger {
+  background-color: rgba(231, 76, 60, 0.15);
+  color: var(--danger);
+  border-left: 4px solid var(--danger);
+}
+
+/* Buttons */
+.btn-contact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-contact:hover {
+  background-color: var(--primary-dark);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.btn-contact i {
+  margin-right: 0.5rem;
+}
+
+/* Responsive layout */
+@media (max-width: 767px) {
+  .track-card {
+    padding: 1.5rem;
+  }
+  
+  .timeline-points {
+    flex-wrap: wrap;
+  }
+  
+  .timeline-point {
+    width: 33.33%;
+    margin-bottom: 1.5rem;
+  }
+  
+  .timeline-track, 
+  .timeline-progress {
+    display: none;
+  }
+  
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .detail-value {
+    margin-top: 0.25rem;
+  }
+  
+  .item-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .item-qty {
+    margin: 0.5rem 0;
+  }
+} 
